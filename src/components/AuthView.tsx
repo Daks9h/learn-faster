@@ -38,7 +38,7 @@ export const AuthView: React.FC<AuthViewProps> = ({
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [institution, setInstitution] = useState('UC Berkeley');
+  const [institution, setInstitution] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,6 +49,7 @@ export const AuthView: React.FC<AuthViewProps> = ({
     setMode('login');
     setEmail('scout@berkeley.edu');
     setPassword('password123');
+    setInstitution('UC Berkeley');
     setError(null);
   };
 
@@ -324,7 +325,7 @@ export const AuthView: React.FC<AuthViewProps> = ({
                     type="text"
                     value={institution}
                     onChange={(e) => setInstitution(e.target.value)}
-                    placeholder="UC Berkeley"
+                    placeholder="e.g. UC Berkeley, Stanford, MIT"
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl border-2 border-border-dark bg-page text-navy text-sm font-sans focus:outline-none focus:bg-surface focus:ring-2 focus:ring-accent"
                   />
                 </div>

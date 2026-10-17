@@ -139,17 +139,20 @@ export const authService = {
     }
 
     // Client fallback demo credentials
+    const isDemoEmail = trimmedEmail === 'scout@berkeley.edu';
     const demoUser: User = {
-      id: 'usr_' + Math.random().toString(36).substring(2, 9),
-      name: trimmedEmail.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()) || 'Daksh',
+      id: isDemoEmail ? 'usr_scout_1' : 'usr_' + Math.random().toString(36).substring(2, 9),
+      name: isDemoEmail 
+        ? 'Daksh' 
+        : trimmedEmail.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()) || 'Scholar',
       email: trimmedEmail,
-      institution: trimmedEmail.includes('berkeley') ? 'UC Berkeley' : 'Stanford University',
-      level: 7,
+      institution: isDemoEmail ? 'UC Berkeley' : (trimmedEmail.includes('berkeley') ? 'UC Berkeley' : 'Academic Scholar'),
+      level: isDemoEmail ? 7 : 1,
       profileSettings: {
-        targetCourse: 'CS 152: Computer Architecture',
+        targetCourse: isDemoEmail ? 'CS 152: Computer Architecture' : 'General Course Studies',
         gradeGoal: 'A (Top 10%)',
         studyMode: 'High-Yield (Audio + Exam Radar)',
-        examDate: 'Midterm 2 · 12 Days Remaining',
+        examDate: isDemoEmail ? 'Midterm 2 · 12 Days Remaining' : 'Upcoming Exam',
       },
     };
 
@@ -172,7 +175,7 @@ export const authService = {
           name: trimmedName,
           email: trimmedEmail,
           password,
-          institution: institution?.trim() || 'UC Berkeley',
+          institution: institution?.trim() || 'Academic Scholar',
         }),
       });
 
@@ -198,13 +201,13 @@ export const authService = {
       id: 'usr_' + Math.random().toString(36).substring(2, 9),
       name: trimmedName || 'New Scholar',
       email: trimmedEmail,
-      institution: institution?.trim() || 'UC Berkeley',
+      institution: institution?.trim() || 'Academic Scholar',
       level: 1,
       profileSettings: {
-        targetCourse: 'CS 152: Computer Architecture',
+        targetCourse: 'General Course Studies',
         gradeGoal: 'A (Top 10%)',
         studyMode: 'High-Yield (Audio + Exam Radar)',
-        examDate: 'Midterm 2 · 12 Days Remaining',
+        examDate: 'Upcoming Exam',
       },
     };
 

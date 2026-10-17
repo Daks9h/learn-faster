@@ -18,9 +18,14 @@ import {
 } from 'lucide-react';
 import { ScoutMark, RadarCompassGraphic } from './Illustrations';
 
+import { StudyMaterial, User } from '../types';
+
 interface HomeViewProps {
   stats: UserStats;
   weakConcept: ConceptItem;
+  material?: StudyMaterial | null;
+  isDemoActive?: boolean;
+  currentUser?: User | null;
   onNavigate: (tab: ScreenTab) => void;
   onTargetRevision: () => void;
 }
@@ -28,9 +33,33 @@ interface HomeViewProps {
 export const HomeView: React.FC<HomeViewProps> = ({
   stats,
   weakConcept,
+  material,
+  isDemoActive,
+  currentUser,
   onNavigate,
   onTargetRevision,
 }) => {
+  const questTitle = material
+    ? `Master ${material.courseTitle}: ${material.keyConcepts[0]?.title || 'Core Principles'}`
+    : isDemoActive
+    ? "Master Computer Architecture: Booth's Multiplier & IEEE 754 (Demo)"
+    : "Synthesize Your First Lecture to Begin Quest Progression";
+
+  const questSub = material
+    ? `${material.keyConcepts.length} Key Concepts · High-Yield Target`
+    : isDemoActive
+    ? "UC Berkeley CS 152 · High-Yield Target"
+    : "Paste a lecture recording or notes to generate your personal study package";
+
+  const questProgress = material
+    ? `${stats.masteryOverall}% completed · +${Math.max(20, stats.xpTarget - stats.xpCurrent)} XP to Level ${stats.level + 1}`
+    : isDemoActive
+    ? "62% completed · +120 XP Reward"
+    : "Ready for Intake · +50 XP Reward";
+
+  const questButtonText = material || isDemoActive ? "RESUME QUEST" : "START INTAKE";
+  const handleQuestAction = () => onNavigate(material || isDemoActive ? 'quiz' : 'lecture');
+
   return (
     <div className="space-y-8 max-w-5xl mx-auto py-2">
       {/* 1. HERO EXPEDITION BRIEF & SCOUT'S GUIDANCE */}
@@ -56,23 +85,23 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   ACTIVE QUEST
                 </span>
                 <span className="text-xs font-mono font-semibold text-secondary">
-                  Week 04 · High-Yield Target
+                  {questSub}
                 </span>
               </div>
               <h1 className="text-base md:text-lg font-display font-extrabold text-navy tracking-tight">
-                Master Computer Architecture: Booth's Multiplier & IEEE 754
+                {questTitle}
               </h1>
               <p className="text-xs text-secondary">
-                62% completed · <span className="font-bold text-accent">+120 XP Reward</span>
+                {questProgress}
               </p>
             </div>
 
             <div className="flex-shrink-0">
               <button
-                onClick={() => onNavigate('quiz')}
+                onClick={handleQuestAction}
                 className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-accent hover:bg-accent-hover text-white font-display font-black text-xs md:text-sm border-2 border-border-dark shadow-ink hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-ink-press transition-all"
               >
-                <span>RESUME QUEST</span>
+                <span>{questButtonText}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>

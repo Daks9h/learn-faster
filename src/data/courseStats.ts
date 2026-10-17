@@ -1,6 +1,9 @@
 import { ConceptItem, UserStats } from '../types';
 
-export const INITIAL_USER_STATS: UserStats = {
+/**
+ * Berkeley CS 152 Demo Stats (Preserved exclusively for demo mode)
+ */
+export const DEMO_BERKELEY_STATS: UserStats = {
   streakDays: 4,
   xpCurrent: 820,
   xpTarget: 1000,
@@ -10,6 +13,58 @@ export const INITIAL_USER_STATS: UserStats = {
   weakTopicsCount: 2,
   totalCardsReviewed: 18,
 };
+
+/**
+ * Clean personalized stats for new users and fresh sessions
+ */
+export const DEFAULT_NEW_USER_STATS: UserStats = {
+  streakDays: 0,
+  xpCurrent: 0,
+  xpTarget: 100,
+  level: 1,
+  levelTitle: 'Novice Scholar',
+  masteryOverall: 0,
+  weakTopicsCount: 0,
+  totalCardsReviewed: 0,
+};
+
+export const INITIAL_USER_STATS: UserStats = DEMO_BERKELEY_STATS;
+
+const STATS_STORAGE_PREFIX = 'learnfaster_stats_';
+
+export function getUserStats(user?: { id?: string; email?: string } | null, isDemo = false): UserStats {
+  if (typeof window === 'undefined') return DEFAULT_NEW_USER_STATS;
+
+  if (isDemo || (user?.email && user.email.toLowerCase().includes('scout@berkeley.edu'))) {
+    const demoSaved = localStorage.getItem(`${STATS_STORAGE_PREFIX}demo_berkeley`);
+    if (demoSaved) {
+      try { return JSON.parse(demoSaved); } catch {}
+    }
+    return DEMO_BERKELEY_STATS;
+  }
+
+  const storageKey = user?.id ? `${STATS_STORAGE_PREFIX}${user.id}` : `${STATS_STORAGE_PREFIX}guest`;
+  const saved = localStorage.getItem(storageKey);
+  if (saved) {
+    try {
+      return JSON.parse(saved);
+    } catch {}
+  }
+
+  return DEFAULT_NEW_USER_STATS;
+}
+
+export function saveUserStats(user: { id?: string; email?: string } | null | undefined, stats: UserStats, isDemo = false): void {
+  if (typeof window === 'undefined') return;
+
+  const storageKey = (isDemo || (user?.email && user.email.toLowerCase().includes('scout@berkeley.edu')))
+    ? `${STATS_STORAGE_PREFIX}demo_berkeley`
+    : user?.id 
+    ? `${STATS_STORAGE_PREFIX}${user.id}` 
+    : `${STATS_STORAGE_PREFIX}guest`;
+
+  localStorage.setItem(storageKey, JSON.stringify(stats));
+}
 
 export const COURSE_INFO = {
   institution: 'UC Berkeley',

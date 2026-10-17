@@ -1,6 +1,6 @@
 import React from 'react';
 import { LEGACY_CONCEPTS as CONCEPTS } from '../data/courseStats';
-import { UserStats, ScreenTab } from '../types';
+import { UserStats, ScreenTab, StudyMaterial, ConceptItem } from '../types';
 import { 
   CheckCircle2, 
   AlertTriangle, 
@@ -11,17 +11,52 @@ import {
 
 interface KnowledgeScoreViewProps {
   stats: UserStats;
+  material?: StudyMaterial | null;
+  isDemo?: boolean;
   onLaunchRevision: (conceptId: string) => void;
   onNavigate: (tab: ScreenTab) => void;
 }
 
 export const KnowledgeScoreView: React.FC<KnowledgeScoreViewProps> = ({
   stats,
+  material,
+  isDemo = false,
   onLaunchRevision,
   onNavigate,
 }) => {
-  const masteredConcepts = CONCEPTS.filter((c) => c.status === 'mastered');
-  const weakConcepts = CONCEPTS.filter((c) => c.status === 'weak' || c.status === 'learning');
+  const activeConcepts: ConceptItem[] = React.useMemo(() => {
+    if (material?.keyConcepts && material.keyConcepts.length > 0) {
+      return material.keyConcepts.map((kc, idx) => ({
+        id: `kc-${idx}`,
+        name: kc.term,
+        category: kc.category || 'Core Syllabus',
+        mastery: Math.min(100, Math.max(25, 45 + ((idx * 17) % 50))),
+        status: (idx === 0 ? 'weak' : idx === 1 ? 'learning' : 'mastered') as 'weak' | 'learning' | 'mastered',
+        examProbability: Math.min(95, 70 + ((idx * 7) % 28)),
+        priorityTier: (idx === 0 ? 'critical' : idx < 3 ? 'very-likely' : 'important') as 'critical' | 'very-likely' | 'important',
+        pointsImpact: 10 + (idx % 3) * 5,
+        description: kc.definition,
+        whyItMatters: kc.whyItMatters || 'High-frequency exam target and essential concept.',
+        recommendedAction: 'Drill flashcards and combat quiz to achieve mastery.',
+        trapAlert: kc.trapAlert,
+        formula: kc.formula,
+      }));
+    }
+    return CONCEPTS;
+  }, [material]);
+
+  const masteredConcepts = activeConcepts.filter((c) => c.status === 'mastered');
+  const weakConcepts = activeConcepts.filter((c) => c.status === 'weak' || c.status === 'learning');
+
+  const gradeProjection = stats.masteryOverall >= 90 
+    ? 'A (Top 5%)' 
+    : stats.masteryOverall >= 80 
+    ? 'A-' 
+    : stats.masteryOverall >= 70 
+    ? 'B+' 
+    : stats.masteryOverall >= 50 
+    ? 'B' 
+    : 'In Progress';
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto py-2">
@@ -29,21 +64,23 @@ export const KnowledgeScoreView: React.FC<KnowledgeScoreViewProps> = ({
       <section className="bg-surface border-2 border-border-dark rounded-2xl p-5 md:p-7 shadow-ink flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-2">
           <h1 className="font-display font-black text-xl md:text-2xl text-navy tracking-tight">
-            CS 152 Knowledge Map & Score
+            {material?.courseTitle 
+              ? `${material.courseTitle.split(/[:–-]/)[0].trim()} Knowledge Map & Score` 
+              : (isDemo ? 'UC Berkeley CS 152 Knowledge Map & Score (Demo)' : 'Knowledge Map & Mastery Score')}
           </h1>
         </div>
 
         {/* Large Score Dial Card */}
         <div className="bg-page border-2 border-border-dark rounded-xl p-5 text-center min-w-[200px] shadow-ink-sm flex-shrink-0">
           <div className="text-[11px] font-mono text-secondary uppercase font-bold">
-            Predicted Midterm Score
+            Predicted Exam Score
           </div>
           <div className="text-4xl font-display font-black text-accent my-1">
             {stats.masteryOverall}%
           </div>
           <div className="inline-flex items-center gap-1 text-[11px] font-mono font-bold text-accent bg-accent-tint px-2 py-0.5 rounded border border-accent/30">
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Grade Projection: A-</span>
+            <span>Grade Projection: {gradeProjection}</span>
           </div>
         </div>
       </section>
@@ -181,12 +218,14 @@ export const KnowledgeScoreView: React.FC<KnowledgeScoreViewProps> = ({
       <section className="bg-surface-solid border-2 border-border-dark text-white rounded-2xl p-6 md:p-7 shadow-ink-lg flex flex-col md:flex-row md:items-center justify-between gap-5">
         <div className="space-y-1">
           <h2 className="text-lg md:text-xl font-display font-black text-white">
-            Ready to close the remaining 18% gap?
+            {stats.masteryOverall < 100 
+              ? `Ready to close the remaining ${100 - stats.masteryOverall}% gap?`
+              : 'Course mastery achieved! Ready for full-speed exam simulation?'}
           </h2>
         </div>
 
         <button
-          onClick={() => onLaunchRevision('ieee-rounding')}
+          onClick={() => onLaunchRevision(weakConcepts[0]?.id || activeConcepts[0]?.id || 'kc-0')}
           className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-accent hover:bg-accent-hover text-white font-display font-black text-xs md:text-sm border-2 border-white/40 shadow-ink hover:translate-x-0.5 hover:translate-y-0.5 transition-all flex-shrink-0"
         >
           <span>LAUNCH 3-MIN TARGETED REVISION</span>

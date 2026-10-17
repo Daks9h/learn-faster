@@ -36,17 +36,18 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   onNavigate,
   onLogout,
 }) => {
+  const isBerkeley = Boolean(user.email && user.email.toLowerCase().includes('berkeley'));
   const currentSettings: UserProfileSettings = user.profileSettings || {
-    targetCourse: 'CS 152: Computer Architecture',
+    targetCourse: isBerkeley ? 'CS 152: Computer Architecture' : 'General Course Studies',
     gradeGoal: 'A (Top 10%)',
     studyMode: 'High-Yield (Audio + Exam Radar)',
-    examDate: 'Midterm 2 · 12 Days Remaining',
+    examDate: isBerkeley ? 'Midterm 2 · 12 Days Remaining' : 'Upcoming Exam',
   };
 
   const [targetCourse, setTargetCourse] = useState(currentSettings.targetCourse);
   const [gradeGoal, setGradeGoal] = useState(currentSettings.gradeGoal);
   const [studyMode, setStudyMode] = useState(currentSettings.studyMode);
-  const [examDate, setExamDate] = useState(currentSettings.examDate || 'Midterm 2 · 12 Days Remaining');
+  const [examDate, setExamDate] = useState(currentSettings.examDate || (isBerkeley ? 'Midterm 2 · 12 Days Remaining' : 'Upcoming Exam'));
   const [isEditing, setIsEditing] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
 
@@ -97,7 +98,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               <span>·</span>
               <span className="flex items-center gap-1">
                 <GraduationCap className="w-3.5 h-3.5 text-navy" />
-                {user.institution || 'UC Berkeley'}
+                {user.institution || (isBerkeley ? 'UC Berkeley' : 'Academic Scholar')}
               </span>
             </div>
           </div>
@@ -164,7 +165,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                   value={targetCourse}
                   onChange={(e) => setTargetCourse(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl border-2 border-border-dark bg-page text-navy text-sm font-sans focus:outline-none focus:bg-surface focus:ring-2 focus:ring-accent"
-                  placeholder="CS 152: Computer Architecture"
+                  placeholder="e.g. CS 152: Computer Architecture"
                   required
                 />
               </div>
@@ -354,7 +355,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             Ready to train for {targetCourse}?
           </h3>
           <p className="text-xs sm:text-sm text-white/80">
-            Launch into your Berkeley midterm basecamp or drill directly into weak-node flashcards.
+            Launch into your personalized study basecamp or drill directly into weak-node flashcards.
           </p>
         </div>
 

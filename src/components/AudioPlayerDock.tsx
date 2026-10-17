@@ -13,6 +13,8 @@ import {
 } from 'lucide-react';
 import { CassetteDeckIllustration } from './Illustrations';
 
+import { StudyMaterial } from '../types';
+
 const AUDIO_CHAPTERS = [
   { id: 1, title: "Foundations: Two's Complement & Sign Extension", startTime: '00:00', startSec: 0 },
   { id: 2, title: "Core Shortcut: Booth's Hardware Skipping", startTime: '01:05', startSec: 65 },
@@ -20,13 +22,28 @@ const AUDIO_CHAPTERS = [
   { id: 4, title: 'IEEE 754 Floating Point: Rounding Traps', startTime: '02:35', startSec: 155 },
 ];
 
+interface AudioPlayerDockProps {
+  material?: StudyMaterial | null;
+}
 
-export const AudioPlayerDock: React.FC = () => {
+export const AudioPlayerDock: React.FC<AudioPlayerDockProps> = ({ material }) => {
+  const chapters = React.useMemo(() => {
+    if (material?.keyConcepts && material.keyConcepts.length > 0) {
+      return material.keyConcepts.slice(0, 6).map((kc, idx) => ({
+        id: idx + 1,
+        title: kc.term,
+        startTime: `0${idx}:00`,
+        startSec: idx * 45,
+      }));
+    }
+    return AUDIO_CHAPTERS;
+  }, [material]);
+
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTimeSec, setCurrentTimeSec] = useState(74); // 01:14
-  const totalDurationSec = 190; // 03:10
+  const [currentTimeSec, setCurrentTimeSec] = useState(0);
+  const totalDurationSec = chapters.length * 45;
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.5);
-  const [currentChapterIdx, setCurrentChapterIdx] = useState(1);
+  const [currentChapterIdx, setCurrentChapterIdx] = useState(0);
   const [isMinimized, setIsMinimized] = useState(false);
 
   // Playback timer ticker
@@ -64,12 +81,12 @@ export const AudioPlayerDock: React.FC = () => {
   };
 
   const handleNextChapter = () => {
-    const nextIdx = (currentChapterIdx + 1) % AUDIO_CHAPTERS.length;
+    const nextIdx = (currentChapterIdx + 1) % chapters.length;
     setCurrentChapterIdx(nextIdx);
-    setCurrentTimeSec(AUDIO_CHAPTERS[nextIdx].startSec);
+    setCurrentTimeSec(chapters[nextIdx].startSec);
   };
 
-  const currentChapter = AUDIO_CHAPTERS[currentChapterIdx];
+  const currentChapter = chapters[currentChapterIdx] || chapters[0];
 
   if (isMinimized) {
     return (
@@ -79,7 +96,7 @@ export const AudioPlayerDock: React.FC = () => {
           className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-surface border-2 border-border-dark shadow-ink hover:translate-y-[-2px] transition-all font-mono text-xs font-bold text-navy"
         >
           <span className="w-2.5 h-2.5 rounded-full bg-accent animate-pulse" />
-          <span>Field Cassette (03:10)</span>
+          <span>Field Cassette ({formatTime(totalDurationSec)})</span>
           <ChevronUp className="w-4 h-4 text-secondary" />
         </button>
       </div>
@@ -99,7 +116,7 @@ export const AudioPlayerDock: React.FC = () => {
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
                 <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-black bg-accent text-white border border-border-dark">
-                  TAPE 04
+                  {material ? 'ACTIVE' : 'TAPE 04'}
                 </span>
                 <span className="text-xs font-display font-black text-navy truncate max-w-[200px] sm:max-w-xs">
                   {currentChapter.title}

@@ -19,7 +19,7 @@ interface LectureViewProps {
   material: StudyMaterial | null;
   status: 'idle' | 'processing' | 'ready' | 'error';
   onStatusChange: (status: 'idle' | 'processing' | 'ready' | 'error') => void;
-  onMaterialLoaded: (material: StudyMaterial) => void;
+  onMaterialLoaded: (material: StudyMaterial, isDemo?: boolean) => void;
   onExploreConcept: (conceptId: string) => void;
   onOpenRadar: () => void;
 }
@@ -40,7 +40,7 @@ export const LectureView: React.FC<LectureViewProps> = ({
   onExploreConcept, 
   onOpenRadar 
 }) => {
-  const [activeInputTab, setActiveInputTab] = useState<'yt' | 'pdf' | 'preset'>('preset');
+  const [activeInputTab, setActiveInputTab] = useState<'yt' | 'pdf' | 'preset'>('yt');
   const [inputValue, setInputValue] = useState('');
   const [progressPercent, setProgressPercent] = useState(0);
   const [progressStage, setProgressStage] = useState('Initializing synthesis pipeline...');
@@ -130,7 +130,7 @@ export const LectureView: React.FC<LectureViewProps> = ({
 
       // Brief delay so user sees 100% completion meter
       setTimeout(() => {
-        onMaterialLoaded(result);
+        onMaterialLoaded(result, isPreset);
         onStatusChange('ready');
       }, 700);
     } catch (err: unknown) {
@@ -146,11 +146,11 @@ export const LectureView: React.FC<LectureViewProps> = ({
     setErrorMessage(null);
 
     if (tab === 'yt') {
-      setInputValue('https://youtu.be/CS152_Lec04_Radix4_Multiplication');
+      setInputValue('');
     } else if (tab === 'pdf') {
       setInputValue('');
     } else {
-      setInputValue('CS152_Fall24_Syllabus_Demo_Preset');
+      setInputValue('UC Berkeley CS 152: High-Speed Arithmetic & IEEE 754 (Demo Preset)');
     }
   };
 
@@ -174,7 +174,7 @@ export const LectureView: React.FC<LectureViewProps> = ({
               </h1>
             </div>
             <p className="text-xs text-secondary mt-0.5">
-              {material?.courseTitle ?? 'UC Berkeley CS 152: Computer Architecture & Engineering'}
+              {material?.courseTitle ?? (activeInputTab === 'preset' ? 'UC Berkeley CS 152: Computer Architecture & Engineering (Demo Preset)' : 'Personalized AI Lecture Ingestion')}
             </p>
           </div>
 
@@ -220,7 +220,7 @@ export const LectureView: React.FC<LectureViewProps> = ({
                   : 'text-secondary border-transparent hover:text-navy'
               }`}
             >
-              Berkeley CS 152 Demo
+              Demo (Berkeley CS 152)
             </button>
           </div>
 

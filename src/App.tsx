@@ -5,7 +5,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { ScreenTab, UserStats, StudyMaterial, User } from './types';
-import { INITIAL_USER_STATS, LEGACY_CONCEPTS as CONCEPTS } from './data/courseStats';
+import { 
+  getUserStats, 
+  saveUserStats, 
+  DEMO_BERKELEY_STATS, 
+  DEFAULT_NEW_USER_STATS, 
+  LEGACY_CONCEPTS as CONCEPTS 
+} from './data/courseStats';
 import { Header } from './components/Header';
 import { HomePage } from './components/HomePage/HomePage';
 import { HomeView } from './components/HomeView';
@@ -68,10 +74,32 @@ export default function App() {
     }
     return 'home';
   });
-  const [material, setMaterial] = useState<StudyMaterial | null>(null);
-  const [status, setStatus] = useState<'idle' | 'processing' | 'ready' | 'error'>('idle');
-  const [stats, setStats] = useState<UserStats>(INITIAL_USER_STATS);
+  const [material, setMaterial] = useState<StudyMaterial | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const saved = localStorage.getItem('learnfaster_active_material');
+    if (saved) {
+      try { return JSON.parse(saved); } catch {}
+    }
+    return null;
+  });
+  const [status, setStatus] = useState<'idle' | 'processing' | 'ready' | 'error'>(() => {
+    if (typeof window === 'undefined') return 'idle';
+    return localStorage.getItem('learnfaster_active_material') ? 'ready' : 'idle';
+  });
+  const [isDemoActive, setIsDemoActive] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem('learnfaster_is_demo_active') === 'true';
+  });
+  const [stats, setStats] = useState<UserStats>(() => {
+    const isDemo = typeof window !== 'undefined' && localStorage.getItem('learnfaster_is_demo_active') === 'true';
+    return getUserStats(authService.getCurrentUser(), isDemo);
+  });
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Sync stats when user session changes
+  useEffect(() => {
+    setStats(getUserStats(currentUser, isDemoActive));
+  }, [currentUser, isDemoActive]);
 
   // Sync tab with browser history
   const handleSelectTab = (tab: ScreenTab) => {
@@ -106,12 +134,17 @@ export default function App() {
     setStats((prev) => {
       const newXp = prev.xpCurrent + amount;
       const leveledUp = newXp >= prev.xpTarget;
-      return {
+      const updatedStreak = prev.streakDays === 0 ? 1 : prev.streakDays;
+      const updated: UserStats = {
         ...prev,
+        streakDays: updatedStreak,
         xpCurrent: newXp,
         level: leveledUp ? prev.level + 1 : prev.level,
+        xpTarget: leveledUp ? prev.xpTarget + 200 : prev.xpTarget,
         masteryOverall: Math.min(100, prev.masteryOverall + 1),
       };
+      saveUserStats(currentUser, updated, isDemoActive);
+      return updated;
     });
     triggerToast(`+${amount} XP Earned · Progress recorded!`);
   };
@@ -126,27 +159,52 @@ export default function App() {
     triggerToast(`Loaded active recall deck for ${conceptTitle}!`);
   };
 
-  const handleMaterialLoaded = (newMaterial: StudyMaterial) => {
+  const handleMaterialLoaded = (newMaterial: StudyMaterial, isDemo = false) => {
     setMaterial(newMaterial);
     setStatus('ready');
-    triggerToast('Study material generated successfully!');
+    setIsDemoActive(isDemo);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('learnfaster_active_material', JSON.stringify(newMaterial));
+      localStorage.setItem('learnfaster_is_demo_active', isDemo ? 'true' : 'false');
+    }
+    if (isDemo) {
+      setStats(DEMO_BERKELEY_STATS);
+      saveUserStats(currentUser, DEMO_BERKELEY_STATS, true);
+      triggerToast('Berkeley CS 152 Demo lecture loaded!');
+    } else {
+      triggerToast('Study material generated successfully!');
+      handleEarnXp(50);
+    }
   };
 
   const handleAuthSuccess = (user: User) => {
     setCurrentUser(user);
     triggerToast(`Welcome, ${user.name}!`);
-    // Post-login redirect points directly to Home (/)
     handleSelectTab('home');
   };
 
   const handleLogout = () => {
     authService.logout();
     setCurrentUser(null);
+    setIsDemoActive(false);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('learnfaster_active_material');
+      localStorage.removeItem('learnfaster_is_demo_active');
+    }
     triggerToast('Signed out of session');
     handleSelectTab('auth');
   };
 
   const isHome = activeTab === 'home' || activeTab === 'dashboard';
+
+  // Dynamic course badge in top header
+  const courseBadge = isDemoActive
+    ? 'CS 152 (Demo)'
+    : material?.courseTitle
+    ? (material.courseTitle.split(/[:–-]/)[0].trim().slice(0, 14))
+    : currentUser?.profileSettings?.targetCourse
+    ? (currentUser.profileSettings.targetCourse.split(/[:–-]/)[0].trim().slice(0, 14))
+    : null;
 
   return (
     <div className="min-h-screen bg-page space-backdrop text-navy flex flex-col font-sans selection:bg-accent-tint selection:text-accent">
@@ -156,6 +214,7 @@ export default function App() {
         onSelectTab={handleSelectTab}
         stats={stats}
         currentUser={currentUser}
+        courseBadge={courseBadge}
       />
 
       {/* 2. TOAST NOTIFICATION BADGE */}
@@ -177,16 +236,16 @@ export default function App() {
       ) : (
         /* All other views (Profile, Camp, Lecture, etc.) */
         <main className="flex-1 max-w-7xl w-full mx-auto px-4 md:px-8 py-6 pb-32">
-          {!currentUser ? (
+          {activeTab === 'auth' || (activeTab === 'profile' && !currentUser) ? (
             <AuthView
-              currentUser={null}
+              currentUser={currentUser}
               onAuthSuccess={handleAuthSuccess}
               onLogout={handleLogout}
               onNavigateHome={() => handleSelectTab('home')}
             />
           ) : (
             <>
-              {activeTab === 'profile' && (
+              {activeTab === 'profile' && currentUser && (
                 <ProfileView
                   user={currentUser}
                   stats={stats}
@@ -203,6 +262,9 @@ export default function App() {
                 <HomeView
                   stats={stats}
                   weakConcept={weakConcept}
+                  material={material}
+                  isDemoActive={isDemoActive}
+                  currentUser={currentUser}
                   onNavigate={handleSelectTab}
                   onTargetRevision={() => handleLaunchRevision(weakConcept.id)}
                 />
@@ -247,21 +309,10 @@ export default function App() {
               {activeTab === 'score' && (
                 <KnowledgeScoreView
                   stats={stats}
+                  material={material}
+                  isDemo={isDemoActive}
                   onLaunchRevision={(id) => handleLaunchRevision(id)}
                   onNavigate={handleSelectTab}
-                />
-              )}
-
-              {activeTab === 'auth' && (
-                <ProfileView
-                  user={currentUser}
-                  stats={stats}
-                  onUpdateUser={(updated) => {
-                    setCurrentUser(updated);
-                    triggerToast('Profile alignment updated!');
-                  }}
-                  onNavigate={handleSelectTab}
-                  onLogout={handleLogout}
                 />
               )}
             </>
@@ -270,7 +321,7 @@ export default function App() {
       )}
 
       {/* 4. DOCKED FIELD CASSETTE / AUDIO RECAP PLAYER */}
-      {currentUser && activeTab !== 'auth' && !isHome && <AudioPlayerDock />}
+      {activeTab !== 'auth' && !isHome && <AudioPlayerDock material={material} />}
     </div>
   );
 }

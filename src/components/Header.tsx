@@ -22,9 +22,10 @@ interface HeaderProps {
   onSelectTab: (tab: ScreenTab) => void;
   stats: UserStats;
   currentUser?: User | null;
+  courseBadge?: string | null;
 }
 
-export const Header: React.FC<HeaderProps> = ({ activeTab, onSelectTab, stats, currentUser }) => {
+export const Header: React.FC<HeaderProps> = ({ activeTab, onSelectTab, stats, currentUser, courseBadge }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   const navItems: { id: ScreenTab; label: string; icon: React.ElementType }[] = [
@@ -57,9 +58,11 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, onSelectTab, stats, c
                 <span className="font-display font-black text-lg tracking-tight text-navy">
                   Learn Faster
                 </span>
-                <span className="hidden sm:inline-block text-[11px] font-mono font-semibold text-secondary">
-                  CS 152
-                </span>
+                {courseBadge && (
+                  <span className="hidden sm:inline-block text-[11px] font-mono font-semibold text-secondary">
+                    {courseBadge}
+                  </span>
+                )}
               </div>
             </div>
           </button>
