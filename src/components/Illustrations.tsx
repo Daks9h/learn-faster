@@ -61,24 +61,3 @@ export const LogicCircuitDiagram: React.FC<{ className?: string }> = ({ classNam
     <circle cx="108" cy="30" r="3" fill="#c9813c" stroke="rgba(200, 180, 245, 0.6)" strokeWidth="1.5" />
   </svg>
 );
-
-export const CassetteDeckIllustration: React.FC<{ className?: string }> = ({ className = '' }) => (
-  <svg
-    width="52"
-    height="36"
-    viewBox="0 0 52 36"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className={className}
-    aria-hidden="true"
-  >
-    <rect x="2" y="2" width="48" height="32" rx="0" fill="#141024" stroke="rgba(200, 180, 245, 0.4)" strokeWidth="1.5" />
-    <rect x="8" y="7" width="36" height="18" rx="0" fill="#201838" stroke="#c9813c" strokeWidth="1.5" />
-    {/* Spools */}
-    <circle cx="18" cy="16" r="4.5" fill="rgba(201, 129, 60, 0.25)" stroke="rgba(200, 180, 245, 0.6)" strokeWidth="1.5" />
-    <circle cx="18" cy="16" r="2" fill="#c9813c" />
-    <circle cx="34" cy="16" r="4.5" fill="rgba(201, 129, 60, 0.25)" stroke="rgba(200, 180, 245, 0.6)" strokeWidth="1.5" />
-    <circle cx="34" cy="16" r="2" fill="#c9813c" />
-    <line x1="22.5" y1="16" x2="29.5" y2="16" stroke="#c9813c" strokeWidth="1" strokeDasharray="1 1" />
-  </svg>
-);

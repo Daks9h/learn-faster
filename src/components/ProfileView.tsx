@@ -40,7 +40,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   const currentSettings: UserProfileSettings = user.profileSettings || {
     targetCourse: isBerkeley ? 'CS 152: Computer Architecture' : 'General Course Studies',
     gradeGoal: 'A (Top 10%)',
-    studyMode: 'High-Yield (Audio + Exam Radar)',
+    studyMode: 'High-Yield (Exam Radar & Combat Arena)',
     examDate: isBerkeley ? 'Midterm 2 · 12 Days Remaining' : 'Upcoming Exam',
   };
 
@@ -208,7 +208,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                   onChange={(e) => setStudyMode(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl border-2 border-border-dark bg-page text-navy text-sm font-sans focus:outline-none focus:bg-surface focus:ring-2 focus:ring-accent"
                 >
-                  <option value="High-Yield (Audio + Exam Radar)">High-Yield (Audio + Exam Radar)</option>
+                  <option value="High-Yield (Exam Radar & Combat Arena)">High-Yield (Exam Radar & Combat Arena)</option>
                   <option value="Derivation & Deep HW Invariants">Derivation & Deep HW Invariants</option>
                   <option value="Rapid Combat Drills Only">Rapid Combat Drills Only</option>
                 </select>

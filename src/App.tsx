@@ -23,7 +23,6 @@ import { KnowledgeScoreView } from './components/KnowledgeScoreView';
 import { AuthView } from './components/AuthView';
 import { DoorLockView } from './components/DoorLockView';
 import { ProfileView } from './components/ProfileView';
-import { AudioPlayerDock } from './components/AudioPlayerDock';
 import { demoMaterial } from './data/demoLecture';
 import { authService } from './services/authService';
 import { Zap } from 'lucide-react';
@@ -272,7 +271,7 @@ export default function App() {
         </main>
       ) : (
         /* All other views (Profile, Camp, Lecture, etc.) */
-        <main className="flex-1 max-w-7xl w-full mx-auto px-4 md:px-8 py-6 pb-32">
+        <main className="flex-1 max-w-7xl w-full mx-auto px-4 md:px-8 py-6 pb-12">
           {activeTab === 'profile' || activeTab === 'auth' ? (
             <ProfileView
               user={currentUser}
@@ -348,9 +347,6 @@ export default function App() {
           )}
         </main>
       )}
-
-      {/* 4. DOCKED FIELD CASSETTE / AUDIO RECAP PLAYER */}
-      {activeTab !== 'auth' && !isHome && <AudioPlayerDock material={material} />}
     </div>
   );
 }

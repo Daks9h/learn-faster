@@ -151,7 +151,7 @@ export const authService = {
       profileSettings: {
         targetCourse: isDemoEmail ? 'CS 152: Computer Architecture' : 'General Course Studies',
         gradeGoal: 'A (Top 10%)',
-        studyMode: 'High-Yield (Audio + Exam Radar)',
+        studyMode: 'High-Yield (Exam Radar & Combat Arena)',
         examDate: isDemoEmail ? 'Midterm 2 · 12 Days Remaining' : 'Upcoming Exam',
       },
     };
@@ -206,7 +206,7 @@ export const authService = {
       profileSettings: {
         targetCourse: 'General Course Studies',
         gradeGoal: 'A (Top 10%)',
-        studyMode: 'High-Yield (Audio + Exam Radar)',
+        studyMode: 'High-Yield (Exam Radar & Combat Arena)',
         examDate: 'Upcoming Exam',
       },
     };
@@ -226,7 +226,7 @@ export const authService = {
         ...(user.profileSettings || {
           targetCourse: 'CS 152: Computer Architecture',
           gradeGoal: 'A (Top 10%)',
-          studyMode: 'High-Yield (Audio + Exam Radar)',
+          studyMode: 'High-Yield (Exam Radar & Combat Arena)',
           examDate: 'Midterm 2 · 12 Days Remaining',
         }),
         ...settings,
