@@ -16,13 +16,13 @@ export const ScoutMark: React.FC<{ className?: string; size?: number }> = ({ cla
     aria-hidden="true"
   >
     {/* Scout Explorer Cap & Visor */}
-    <rect x="10" y="10" width="28" height="28" rx="8" fill="rgba(201, 129, 60, 0.2)" stroke="rgba(215, 195, 255, 0.6)" strokeWidth="2" />
+    <rect x="10" y="10" width="28" height="28" rx="0" fill="rgba(201, 129, 60, 0.2)" stroke="rgba(215, 195, 255, 0.6)" strokeWidth="2" />
     {/* Cap Bill */}
     <path d="M12 20C12 16 16 14 24 14C32 14 36 16 36 20" stroke="#c9813c" strokeWidth="2" strokeLinecap="round" />
     <path d="M22 10V14" stroke="#c9813c" strokeWidth="2.5" strokeLinecap="round" />
     {/* Explorer Goggles / Eyes */}
-    <rect x="15" y="22" width="7" height="6" rx="3" fill="#18122c" stroke="#c9813c" strokeWidth="1.5" />
-    <rect x="26" y="22" width="7" height="6" rx="3" fill="#18122c" stroke="#c9813c" strokeWidth="1.5" />
+    <rect x="15" y="22" width="7" height="6" rx="0" fill="#18122c" stroke="#c9813c" strokeWidth="1.5" />
+    <rect x="26" y="22" width="7" height="6" rx="0" fill="#18122c" stroke="#c9813c" strokeWidth="1.5" />
     <circle cx="18.5" cy="25" r="1.5" fill="#f3effa" />
     <circle cx="29.5" cy="25" r="1.5" fill="#f3effa" />
     <path d="M22 25H26" stroke="#c9813c" strokeWidth="2" />
@@ -68,7 +68,7 @@ export const LogicCircuitDiagram: React.FC<{ className?: string }> = ({ classNam
     <path d="M10 20H35" stroke="rgba(200, 180, 245, 0.6)" strokeWidth="2" strokeLinecap="round" />
     <path d="M10 40H35" stroke="rgba(200, 180, 245, 0.6)" strokeWidth="2" strokeLinecap="round" />
     {/* AND / ALU block */}
-    <rect x="35" y="10" width="40" height="40" rx="6" fill="#18122c" stroke="#c9813c" strokeWidth="2" />
+    <rect x="35" y="10" width="40" height="40" rx="0" fill="#18122c" stroke="#c9813c" strokeWidth="2" />
     <text x="55" y="34" fontFamily="Outfit, sans-serif" fontSize="12" fontWeight="800" textAnchor="middle" fill="#f3effa">
       ALU
     </text>
@@ -88,8 +88,8 @@ export const CassetteDeckIllustration: React.FC<{ className?: string }> = ({ cla
     className={className}
     aria-hidden="true"
   >
-    <rect x="2" y="2" width="48" height="32" rx="4" fill="#141024" stroke="rgba(200, 180, 245, 0.4)" strokeWidth="1.5" />
-    <rect x="8" y="7" width="36" height="18" rx="2" fill="#201838" stroke="#c9813c" strokeWidth="1.5" />
+    <rect x="2" y="2" width="48" height="32" rx="0" fill="#141024" stroke="rgba(200, 180, 245, 0.4)" strokeWidth="1.5" />
+    <rect x="8" y="7" width="36" height="18" rx="0" fill="#201838" stroke="#c9813c" strokeWidth="1.5" />
     {/* Spools */}
     <circle cx="18" cy="16" r="4.5" fill="rgba(201, 129, 60, 0.25)" stroke="rgba(200, 180, 245, 0.6)" strokeWidth="1.5" />
     <circle cx="18" cy="16" r="2" fill="#c9813c" />

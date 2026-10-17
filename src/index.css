@@ -22,6 +22,23 @@
   --color-incorrect: #f87171;
   --color-incorrect-tint: rgba(239, 68, 68, 0.22);
   --color-copper: #c9813c;
+
+  /* Universal zero-radius tokens: all elements format as rectangles or squares */
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-4xl: 0px;
+  --radius-full: 0px;
+  --radius: 0px;
+}
+
+/* Universal sharp geometric borders: remove all rounded corners across the whole website */
+*, *::before, *::after {
+  border-radius: 0px !important;
 }
 
 @layer base {
