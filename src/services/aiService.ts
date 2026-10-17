@@ -1,5 +1,6 @@
 import { StudyMaterial } from '../types';
 import { demoMaterial } from '../data/demoLecture';
+import { authService } from './authService';
 
 export interface AnalyzeLectureInput {
   text?: string;
@@ -16,12 +17,18 @@ export async function analyzeLecture(input: AnalyzeLectureInput): Promise<StudyM
   }
 
   // 2. Unsupported input types for now
-  if (input.youtubeUrl || input.file) {
-    throw new Error("This input type isn't available yet. Paste the lecture text instead.");
+  if (input.file) {
+    throw new Error("File upload isn't available yet. Paste the lecture text or enter a YouTube URL.");
   }
 
   const rawText = input.text?.trim() || '';
-  if (!rawText || rawText.length < 200) {
+  const youtubeUrl = input.youtubeUrl?.trim() || '';
+
+  if (!rawText && !youtubeUrl) {
+    throw new Error('Please provide either lecture text or a YouTube URL.');
+  }
+
+  if (!youtubeUrl && rawText.length < 200) {
     throw new Error('Paste at least a few paragraphs of lecture text.');
   }
 
@@ -30,15 +37,21 @@ export async function analyzeLecture(input: AnalyzeLectureInput): Promise<StudyM
   const controller = new AbortController();
   const timeoutId = setTimeout(() => {
     controller.abort();
-  }, 90000); // 90 seconds timeout
+  }, 300000); // 300 seconds (5 min) timeout for comprehensive local multi-chunk synthesis
+
+    const authHeader = authService.getAuthHeader();
 
   try {
     const response = await fetch(`${apiUrl}/api/analyze`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...authHeader,
       },
-      body: JSON.stringify({ text: rawText }),
+      body: JSON.stringify({
+        text: rawText || undefined,
+        youtubeUrl: youtubeUrl || undefined,
+      }),
       signal: controller.signal,
     });
 

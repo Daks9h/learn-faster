@@ -1,12 +1,16 @@
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
+import { YoutubeTranscript } from 'youtube-transcript';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 import express, { Request, Response } from 'express';
 import cors from 'cors';
+import crypto from 'crypto';
+import { z } from 'zod';
 import { getAIProvider } from './providers/index.js';
 import { 
   RawStudyMaterialSchema, 
@@ -42,6 +46,209 @@ app.get('/api/health', (_req: Request, res: Response) => {
   res.json({ ok: true });
 });
 
+// --- JWT & Auth ---
+const JWT_SECRET = process.env.JWT_SECRET || 'lectureai-super-secret-jwt-key-2026';
+
+interface ServerUser {
+  id: string;
+  name: string;
+  email: string;
+  passwordHash: string;
+  institution: string;
+  level: number;
+}
+
+function hashPassword(password: string): string {
+  return crypto.createHash('sha256').update(password).digest('hex');
+}
+
+const users: Map<string, ServerUser> = new Map([
+  [
+    'scout@berkeley.edu',
+    {
+      id: 'usr_scout_1',
+      name: 'Daksh',
+      email: 'scout@berkeley.edu',
+      passwordHash: hashPassword('password123'),
+      institution: 'UC Berkeley',
+      level: 7,
+    },
+  ],
+]);
+
+function signJwt(payload: Record<string, unknown>, expiresInSeconds = 86400 * 7): string {
+  const header = { alg: 'HS256', typ: 'JWT' };
+  const now = Math.floor(Date.now() / 1000);
+  const fullPayload = { ...payload, iat: now, exp: now + expiresInSeconds, iss: 'lectureai-auth' };
+
+  const base64Url = (obj: unknown) =>
+    Buffer.from(JSON.stringify(obj))
+      .toString('base64')
+      .replace(/=/g, '')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_');
+
+  const encHeader = base64Url(header);
+  const encPayload = base64Url(fullPayload);
+  const signature = crypto
+    .createHmac('sha256', JWT_SECRET)
+    .update(`${encHeader}.${encPayload}`)
+    .digest('base64')
+    .replace(/=/g, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_');
+
+  return `${encHeader}.${encPayload}.${signature}`;
+}
+
+function verifyJwt(token: string): { valid: boolean; payload?: any } {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return { valid: false };
+    const [encHeader, encPayload, sig] = parts;
+    const expectedSig = crypto
+      .createHmac('sha256', JWT_SECRET)
+      .update(`${encHeader}.${encPayload}`)
+      .digest('base64')
+      .replace(/=/g, '')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_');
+
+    if (sig !== expectedSig) return { valid: false };
+    let base64 = encPayload.replace(/-/g, '+').replace(/_/g, '/');
+    while (base64.length % 4) base64 += '=';
+    const payload = JSON.parse(Buffer.from(base64, 'base64').toString('utf8'));
+    const now = Math.floor(Date.now() / 1000);
+    if (payload.exp && payload.exp < now) return { valid: false };
+    return { valid: true, payload };
+  } catch {
+    return { valid: false };
+  }
+}
+
+// POST /api/auth/register
+app.post('/api/auth/register', (req: Request, res: Response): void => {
+  const RegisterSchema = z.object({
+    name: z.string().min(1, 'Name is required').max(100),
+    email: z.string().email('Valid email is required'),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+    institution: z.string().optional(),
+  });
+
+  const parsed = RegisterSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.issues[0].message });
+    return;
+  }
+
+  const { name, email, password, institution } = parsed.data;
+  const normalizedEmail = email.toLowerCase().trim();
+
+  if (users.has(normalizedEmail)) {
+    res.status(409).json({ error: 'An account with this email already exists.' });
+    return;
+  }
+
+  const newUser: ServerUser = {
+    id: 'usr_' + crypto.randomUUID().slice(0, 8),
+    name: name.trim(),
+    email: normalizedEmail,
+    passwordHash: hashPassword(password),
+    institution: institution?.trim() || 'UC Berkeley',
+    level: 1,
+  };
+
+  users.set(normalizedEmail, newUser);
+
+  const token = signJwt({
+    sub: newUser.id,
+    name: newUser.name,
+    email: newUser.email,
+    institution: newUser.institution,
+    level: newUser.level,
+  });
+
+  res.status(201).json({
+    token,
+    user: {
+      id: newUser.id,
+      name: newUser.name,
+      email: newUser.email,
+      institution: newUser.institution,
+      level: newUser.level,
+    },
+  });
+});
+
+// POST /api/auth/login
+app.post('/api/auth/login', (req: Request, res: Response): void => {
+  const LoginSchema = z.object({
+    email: z.string().email('Valid email is required'),
+    password: z.string().min(1, 'Password is required'),
+  });
+
+  const parsed = LoginSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.issues[0].message });
+    return;
+  }
+
+  const { email, password } = parsed.data;
+  const normalizedEmail = email.toLowerCase().trim();
+  const user = users.get(normalizedEmail);
+
+  if (!user || user.passwordHash !== hashPassword(password)) {
+    res.status(401).json({ error: 'Invalid email or password.' });
+    return;
+  }
+
+  const token = signJwt({
+    sub: user.id,
+    name: user.name,
+    email: user.email,
+    institution: user.institution,
+    level: user.level,
+  });
+
+  res.json({
+    token,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      institution: user.institution,
+      level: user.level,
+    },
+  });
+});
+
+// GET /api/auth/me
+app.get('/api/auth/me', (req: Request, res: Response): void => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    res.status(401).json({ error: 'Missing or malformed Authorization header.' });
+    return;
+  }
+
+  const token = authHeader.slice(7);
+  const { valid, payload } = verifyJwt(token);
+
+  if (!valid || !payload) {
+    res.status(401).json({ error: 'Token is invalid or expired.' });
+    return;
+  }
+
+  res.json({
+    user: {
+      id: payload.sub,
+      name: payload.name,
+      email: payload.email,
+      institution: payload.institution,
+      level: payload.level,
+    },
+  });
+});
+
 /**
  * Helper to validate raw model output, normalize concepts, and return any error issues.
  */
@@ -68,11 +275,47 @@ function validateAndNormalize(rawOutput: unknown): {
 
 // POST /api/analyze
 app.post('/api/analyze', async (req: Request, res: Response): Promise<void> => {
-  const { text } = req.body || {};
+  let { text, youtubeUrl } = req.body || {};
+
+  // If a YouTube URL is provided, resolve transcript or preset
+  if (youtubeUrl && typeof youtubeUrl === 'string') {
+    const trimmedUrl = youtubeUrl.trim();
+    if (trimmedUrl.includes('CS152') || trimmedUrl.includes('Radix4') || trimmedUrl.includes('Multiplication')) {
+      try {
+        const demoPath = path.resolve(__dirname, '../test.txt');
+        if (fs.existsSync(demoPath)) {
+          text = fs.readFileSync(demoPath, 'utf-8');
+        }
+      } catch (err) {
+        console.warn('[Analyze] Could not read demo transcript file:', err);
+      }
+    } else {
+      try {
+        console.log(`[Analyze] Fetching YouTube transcript for: ${trimmedUrl}`);
+        let transcript;
+        try {
+          transcript = await YoutubeTranscript.fetchTranscript(trimmedUrl, { lang: 'en' });
+        } catch {
+          transcript = await YoutubeTranscript.fetchTranscript(trimmedUrl);
+        }
+
+        if (transcript && transcript.length > 0) {
+          text = transcript.map((t) => t.text).join(' ');
+          console.log(`[Analyze] Successfully extracted ${transcript.length} lines (${text.length} chars) from YouTube.`);
+        }
+      } catch (ytErr: any) {
+        console.error('[Analyze] Failed to fetch YouTube transcript:', ytErr?.message || ytErr);
+        res.status(400).json({
+          error: "Could not extract captions from this YouTube video. Please ensure the video has closed captions/subtitles enabled, or paste the lecture text directly into 'Lecture Notes / Text'.",
+        });
+        return;
+      }
+    }
+  }
 
   if (!text || typeof text !== 'string' || text.trim().length < 200) {
     res.status(400).json({
-      error: 'Lecture text must be at least 200 characters long to generate high-yield study material.',
+      error: 'Lecture text or transcript must be at least 200 characters long to generate high-yield study material.',
     });
     return;
   }
@@ -167,8 +410,9 @@ app.post('/api/analyze', async (req: Request, res: Response): Promise<void> => {
 });
 
 app.listen(port, () => {
-  const modelName = process.env.GEMINI_MODEL;
-  console.log(`[Server] LectureAI server listening on port ${port}`);
-  console.log(`[Server] Loaded AI model: ${modelName || '(none configured)'}`);
+  const provider = (process.env.AI_PROVIDER || 'gemini').trim().toLowerCase();
+  const modelName = provider === 'gemini' ? process.env.GEMINI_MODEL : (process.env.LOCAL_MODEL || 'qwen2.5:7b-instruct');
+  console.log(`[Server] Learn Faster server listening on port ${port}`);
+  console.log(`[Server] Active AI Provider: ${provider} (${modelName})`);
   console.log(`[Server] Client origin restricted to: ${configuredOrigin}`);
 });
