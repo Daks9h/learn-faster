@@ -257,6 +257,27 @@ function validateAndNormalize(rawOutput: unknown): {
   data?: RawStudyMaterial;
   errors: string[];
 } {
+  // Pre-sanitize raw model output: clean up optional fields like tables or empty arrays
+  if (rawOutput && typeof rawOutput === 'object') {
+    const rawObj = rawOutput as any;
+    if (Array.isArray(rawObj.keyConcepts)) {
+      for (const kc of rawObj.keyConcepts) {
+        if (kc && typeof kc === 'object') {
+          if (kc.table) {
+            const hasValidHeaders = Array.isArray(kc.table.headers) && kc.table.headers.length > 0;
+            const hasValidRows = Array.isArray(kc.table.rows) && kc.table.rows.length > 0;
+            if (!hasValidHeaders || !hasValidRows) {
+              delete kc.table;
+            }
+          }
+          if (Array.isArray(kc.keyPoints) && kc.keyPoints.length === 0) {
+            delete kc.keyPoints;
+          }
+        }
+      }
+    }
+  }
+
   const parseResult = RawStudyMaterialSchema.safeParse(rawOutput);
   if (!parseResult.success) {
     const zodErrors = parseResult.error.issues.map(
@@ -276,6 +297,25 @@ function validateAndNormalize(rawOutput: unknown): {
 // POST /api/analyze
 app.post('/api/analyze', async (req: Request, res: Response): Promise<void> => {
   let { text, youtubeUrl } = req.body || {};
+  const streamRequested = req.headers['x-stream-progress'] === 'true' || req.query.stream === 'true';
+
+  let sendProgress: ((percent: number, message: string) => void) | undefined;
+  if (streamRequested) {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders?.();
+
+    sendProgress = (percent: number, message: string) => {
+      try {
+        res.write(`data: ${JSON.stringify({ type: 'progress', percent, message })}\n\n`);
+      } catch (err) {
+        console.warn('[Analyze] Failed to write progress event:', err);
+      }
+    };
+
+    sendProgress(5, 'Connecting to AI Engine...');
+  }
 
   // If a YouTube URL is provided, resolve transcript or preset
   if (youtubeUrl && typeof youtubeUrl === 'string') {
@@ -285,6 +325,7 @@ app.post('/api/analyze', async (req: Request, res: Response): Promise<void> => {
         const demoPath = path.resolve(__dirname, '../test.txt');
         if (fs.existsSync(demoPath)) {
           text = fs.readFileSync(demoPath, 'utf-8');
+          sendProgress?.(15, 'Loaded demo preset transcript.');
         }
       } catch (err) {
         console.warn('[Analyze] Could not read demo transcript file:', err);
@@ -292,6 +333,7 @@ app.post('/api/analyze', async (req: Request, res: Response): Promise<void> => {
     } else {
       try {
         console.log(`[Analyze] Fetching YouTube transcript for: ${trimmedUrl}`);
+        sendProgress?.(10, 'Fetching YouTube lecture transcript...');
         let transcript;
         try {
           transcript = await YoutubeTranscript.fetchTranscript(trimmedUrl, { lang: 'en' });
@@ -302,21 +344,30 @@ app.post('/api/analyze', async (req: Request, res: Response): Promise<void> => {
         if (transcript && transcript.length > 0) {
           text = transcript.map((t) => t.text).join(' ');
           console.log(`[Analyze] Successfully extracted ${transcript.length} lines (${text.length} chars) from YouTube.`);
+          sendProgress?.(18, 'YouTube transcript extracted successfully.');
         }
       } catch (ytErr: any) {
         console.error('[Analyze] Failed to fetch YouTube transcript:', ytErr?.message || ytErr);
-        res.status(400).json({
-          error: "Could not extract captions from this YouTube video. Please ensure the video has closed captions/subtitles enabled, or paste the lecture text directly into 'Lecture Notes / Text'.",
-        });
+        const errMsg = "Could not extract captions from this YouTube video. Please ensure the video has closed captions/subtitles enabled, or paste the lecture text directly into 'Lecture Notes / Text'.";
+        if (streamRequested) {
+          res.write(`data: ${JSON.stringify({ type: 'error', error: errMsg })}\n\n`);
+          res.end();
+          return;
+        }
+        res.status(400).json({ error: errMsg });
         return;
       }
     }
   }
 
   if (!text || typeof text !== 'string' || text.trim().length < 200) {
-    res.status(400).json({
-      error: 'Lecture text or transcript must be at least 200 characters long to generate high-yield study material.',
-    });
+    const errMsg = 'Lecture text or transcript must be at least 200 characters long to generate high-yield study material.';
+    if (streamRequested) {
+      res.write(`data: ${JSON.stringify({ type: 'error', error: errMsg })}\n\n`);
+      res.end();
+      return;
+    }
+    res.status(400).json({ error: errMsg });
     return;
   }
 
@@ -326,21 +377,28 @@ app.post('/api/analyze', async (req: Request, res: Response): Promise<void> => {
     // First attempt
     let rawOutput: unknown;
     try {
-      rawOutput = await provider.generateStudyMaterial(text);
+      rawOutput = await provider.generateStudyMaterial(text, undefined, sendProgress);
     } catch (err) {
       console.error('[Analyze] Provider invocation failed (Attempt 1):', err instanceof Error ? err.message : err);
+      if (streamRequested) {
+        res.write(`data: ${JSON.stringify({ type: 'error', error: "We couldn't analyze this lecture." })}\n\n`);
+        res.end();
+        return;
+      }
       res.status(502).json({ error: "We couldn't analyze this lecture." });
       return;
     }
 
+    sendProgress?.(94, 'Validating study material schema...');
     let validation = validateAndNormalize(rawOutput);
 
     // If validation fails, retry ONCE with validation errors included
     if (!validation.success) {
       console.warn('[Analyze] Attempt 1 failed validation. Retrying with error feedback...', validation.errors);
+      sendProgress?.(70, 'Refining schema consistency and retrying...');
 
       try {
-        const retryOutput = await provider.generateStudyMaterial(text, validation.errors);
+        const retryOutput = await provider.generateStudyMaterial(text, validation.errors, sendProgress);
         validation = validateAndNormalize(retryOutput);
       } catch (err) {
         console.error('[Analyze] Provider invocation failed on retry (Attempt 2):', err instanceof Error ? err.message : err);
@@ -350,6 +408,11 @@ app.post('/api/analyze', async (req: Request, res: Response): Promise<void> => {
     // If it still fails after retry, return 502 without exposing raw model output
     if (!validation.success || !validation.data) {
       console.error('[Analyze] Structured validation failed after retry:', validation.errors);
+      if (streamRequested) {
+        res.write(`data: ${JSON.stringify({ type: 'error', error: "We couldn't analyze this lecture." })}\n\n`);
+        res.end();
+        return;
+      }
       res.status(502).json({ error: "We couldn't analyze this lecture." });
       return;
     }
@@ -398,13 +461,30 @@ app.post('/api/analyze', async (req: Request, res: Response): Promise<void> => {
     const finalVerification = StudyMaterialSchema.safeParse(studyMaterial);
     if (!finalVerification.success) {
       console.error('[Analyze] Final assembly schema mismatch:', finalVerification.error.issues);
+      if (streamRequested) {
+        res.write(`data: ${JSON.stringify({ type: 'error', error: "We couldn't analyze this lecture." })}\n\n`);
+        res.end();
+        return;
+      }
       res.status(502).json({ error: "We couldn't analyze this lecture." });
+      return;
+    }
+
+    if (streamRequested) {
+      sendProgress?.(100, 'Lecture synthesis complete!');
+      res.write(`data: ${JSON.stringify({ type: 'result', data: studyMaterial })}\n\n`);
+      res.end();
       return;
     }
 
     res.json(studyMaterial);
   } catch (err) {
     console.error('[Analyze] Internal error:', err instanceof Error ? err.message : err);
+    if (streamRequested) {
+      res.write(`data: ${JSON.stringify({ type: 'error', error: 'An unexpected error occurred while analyzing the lecture.' })}\n\n`);
+      res.end();
+      return;
+    }
     res.status(500).json({ error: 'An unexpected error occurred while analyzing the lecture.' });
   }
 });

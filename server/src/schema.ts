@@ -134,7 +134,17 @@ export function normalizeConceptTags(raw: RawStudyMaterial): {
       }
     }
 
-    return null;
+    // Keyword matching fallback
+    const conceptWords = lower.split(/\W+/).filter((w) => w.length > 3);
+    for (const title of validTitles) {
+      const titleLower = title.toLowerCase();
+      if (conceptWords.some((w) => titleLower.includes(w))) {
+        return title;
+      }
+    }
+
+    // Default to the first valid title if no match found
+    return validTitles[0] || null;
   };
 
   const updatedRadar = raw.examRadar.map((item) => {

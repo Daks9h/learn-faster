@@ -9,10 +9,23 @@ export interface AnalyzeLectureInput {
   demo?: boolean;
 }
 
-export async function analyzeLecture(input: AnalyzeLectureInput): Promise<StudyMaterial> {
-  // 1. Demo mode: return local demoMaterial immediately (no network call, works with backend off)
+export type ProgressCallback = (percent: number, message: string) => void;
+
+export async function analyzeLecture(
+  input: AnalyzeLectureInput,
+  onProgress?: ProgressCallback
+): Promise<StudyMaterial> {
+  // 1. Demo mode: return local demoMaterial immediately with simulated progress
   if (input.demo) {
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    onProgress?.(15, 'Loading demo lecture preset...');
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    onProgress?.(45, 'Extracting Berkeley CS 152 concepts...');
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    onProgress?.(75, 'Generating exam radar & active recall flashcards...');
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    onProgress?.(95, 'Finalizing study package...');
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    onProgress?.(100, 'Complete!');
     return demoMaterial;
   }
 
@@ -39,13 +52,14 @@ export async function analyzeLecture(input: AnalyzeLectureInput): Promise<StudyM
     controller.abort();
   }, 300000); // 300 seconds (5 min) timeout for comprehensive local multi-chunk synthesis
 
-    const authHeader = authService.getAuthHeader();
+  const authHeader = authService.getAuthHeader();
 
   try {
-    const response = await fetch(`${apiUrl}/api/analyze`, {
+    const response = await fetch(`${apiUrl}/api/analyze?stream=true`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'x-stream-progress': 'true',
         ...authHeader,
       },
       body: JSON.stringify({
@@ -56,6 +70,55 @@ export async function analyzeLecture(input: AnalyzeLectureInput): Promise<StudyM
     });
 
     clearTimeout(timeoutId);
+
+    const contentType = response.headers.get('content-type') || '';
+    if (contentType.includes('text/event-stream')) {
+      const reader = response.body?.getReader();
+      if (!reader) {
+        throw new Error('ReadableStream not supported on response.');
+      }
+
+      const decoder = new TextDecoder('utf-8');
+      let buffer = '';
+      let resultData: StudyMaterial | null = null;
+      let errorData: string | null = null;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n\n');
+        buffer = lines.pop() || '';
+
+        for (const block of lines) {
+          const trimmed = block.trim();
+          if (trimmed.startsWith('data:')) {
+            try {
+              const event = JSON.parse(trimmed.slice(5).trim());
+              if (event.type === 'progress') {
+                onProgress?.(event.percent, event.message);
+              } else if (event.type === 'result') {
+                resultData = event.data;
+              } else if (event.type === 'error') {
+                errorData = event.error;
+              }
+            } catch (e) {
+              console.warn('[aiService] Failed to parse SSE event:', e);
+            }
+          }
+        }
+      }
+
+      if (errorData) {
+        throw new Error(errorData);
+      }
+      if (resultData) {
+        onProgress?.(100, 'Lecture synthesis complete!');
+        return resultData;
+      }
+      throw new Error("We couldn't analyze this lecture.");
+    }
 
     if (!response.ok) {
       let errorMessage = "We couldn't analyze this lecture.";
@@ -71,13 +134,14 @@ export async function analyzeLecture(input: AnalyzeLectureInput): Promise<StudyM
     }
 
     const data = await response.json();
+    onProgress?.(100, 'Complete!');
     return data as StudyMaterial;
   } catch (err: unknown) {
     clearTimeout(timeoutId);
 
     if (err instanceof Error) {
       if (err.name === 'AbortError') {
-        throw new Error('Analysis timed out after 90 seconds. Please try again.');
+        throw new Error('Analysis timed out after 300 seconds. Please try again.');
       }
       if (
         err.message.includes('Failed to fetch') ||

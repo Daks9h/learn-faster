@@ -74,12 +74,19 @@ export class GeminiProvider implements AIProvider {
     return summaries.join('\n\n');
   }
 
-  async generateStudyMaterial(text: string, retryErrors?: string[]): Promise<unknown> {
+  async generateStudyMaterial(
+    text: string, 
+    retryErrors?: string[], 
+    onProgress?: (percent: number, message: string) => void
+  ): Promise<unknown> {
+    onProgress?.(20, 'Analyzing lecture with Gemini...');
     let contentToAnalyze = text;
     if (text.length > 60000) {
+      onProgress?.(35, 'Summarizing large lecture text...');
       contentToAnalyze = await this.summarizeLargeText(text);
     }
 
+    onProgress?.(60, 'Generating structured study package...');
     const isGemma = this.model.toLowerCase().includes('gemma');
     let prompt = buildAnalyzePrompt(contentToAnalyze, retryErrors);
 

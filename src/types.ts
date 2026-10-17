@@ -1,4 +1,25 @@
-export type ScreenTab = 'home' | 'lecture' | 'radar' | 'flashcards' | 'quiz' | 'score';
+export type ScreenTab = 'home' | 'dashboard' | 'camp' | 'lecture' | 'radar' | 'flashcards' | 'quiz' | 'score' | 'auth' | 'profile';
+
+export interface UserProfileSettings {
+  targetCourse: string;
+  gradeGoal: string;
+  studyMode: string;
+  examDate?: string;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  institution?: string;
+  level?: number;
+  profileSettings?: UserProfileSettings;
+}
+
+export interface AuthSession {
+  token: string;
+  user: User;
+}
 
 export interface KeyConcept {
   id: string;
