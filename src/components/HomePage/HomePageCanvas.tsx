@@ -322,15 +322,23 @@ export const HomePageCanvas: React.FC<HomePageCanvasProps> = ({
           Autonomous lecture synthesis, predictive exam radar, and active recall combat arenas.
         </p>
 
-        {/* Action CTA Button */}
-        <div className="mt-6 sm:mt-8 flex items-center gap-3 pointer-events-auto">
+        {/* Action CTA Buttons */}
+        <div className="mt-6 sm:mt-8 flex flex-wrap items-center justify-center sm:justify-start gap-3 pointer-events-auto">
           <button
-            onClick={() => onNavigate('dashboard')}
+            onClick={() => onNavigate('camp')}
             className="px-6 py-3.5 rounded-xl bg-[#c9813c] hover:bg-[#b57130] text-white font-display font-black text-sm sm:text-base border-2 border-white/30 shadow-ink hover:translate-x-0.5 hover:translate-y-0.5 transition-all flex items-center gap-2.5 cursor-pointer pointer-events-auto"
-            title="Navigate to Scholar Dashboard"
+            title="Enter Course Basecamp"
           >
-            <span>OPEN DASHBOARD</span>
+            <span>ENTER BASECAMP</span>
             <ArrowRight className="w-4 h-4" />
+          </button>
+
+          <button
+            onClick={() => onNavigate('profile')}
+            className="px-5 py-3.5 rounded-xl bg-[#141024]/80 hover:bg-[#141024] text-white font-display font-bold text-xs sm:text-sm border-2 border-white/20 hover:border-white/40 shadow-ink transition-all flex items-center gap-2 cursor-pointer pointer-events-auto"
+            title="View Scholar Profile & Course Alignment"
+          >
+            <span>VIEW PROFILE</span>
           </button>
         </div>
       </div>

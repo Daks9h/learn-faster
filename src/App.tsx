@@ -22,8 +22,8 @@ import { Zap } from 'lucide-react';
 
 function getTabFromPath(path: string): ScreenTab {
   const cleanPath = path.toLowerCase().replace(/\/$/, '') || '/';
-  if (cleanPath === '/' || cleanPath === '/home') return 'home';
-  if (cleanPath === '/dashboard' || cleanPath === '/profile') return 'dashboard';
+  if (cleanPath === '/' || cleanPath === '/dashboard' || cleanPath === '/home') return 'dashboard';
+  if (cleanPath === '/profile') return 'profile';
   if (cleanPath === '/camp' || cleanPath === '/basecamp') return 'camp';
   if (cleanPath === '/lecture') return 'lecture';
   if (cleanPath === '/radar' || cleanPath === '/exam-radar') return 'radar';
@@ -31,22 +31,32 @@ function getTabFromPath(path: string): ScreenTab {
   if (cleanPath === '/quiz' || cleanPath === '/quiz-arena') return 'quiz';
   if (cleanPath === '/score' || cleanPath === '/knowledge-map') return 'score';
   if (cleanPath === '/auth') return 'auth';
-  return 'home';
+  return 'dashboard';
 }
 
 function getPathForTab(tab: ScreenTab): string {
   switch (tab) {
-    case 'home': return '/';
-    case 'dashboard': return '/dashboard';
-    case 'profile': return '/dashboard';
-    case 'camp': return '/camp';
-    case 'lecture': return '/lecture';
-    case 'radar': return '/radar';
-    case 'flashcards': return '/flashcards';
-    case 'quiz': return '/quiz';
-    case 'score': return '/score';
-    case 'auth': return '/auth';
-    default: return '/';
+    case 'dashboard':
+    case 'home':
+      return '/dashboard';
+    case 'profile':
+      return '/profile';
+    case 'camp':
+      return '/camp';
+    case 'lecture':
+      return '/lecture';
+    case 'radar':
+      return '/radar';
+    case 'flashcards':
+      return '/flashcards';
+    case 'quiz':
+      return '/quiz';
+    case 'score':
+      return '/score';
+    case 'auth':
+      return '/auth';
+    default:
+      return '/dashboard';
   }
 }
 
@@ -56,7 +66,7 @@ export default function App() {
     if (typeof window !== 'undefined') {
       return getTabFromPath(window.location.pathname);
     }
-    return authService.getToken() ? 'dashboard' : 'home';
+    return 'dashboard';
   });
   const [material, setMaterial] = useState<StudyMaterial | null>(null);
   const [status, setStatus] = useState<'idle' | 'processing' | 'ready' | 'error'>('idle');
@@ -65,9 +75,8 @@ export default function App() {
 
   // Sync tab with browser history
   const handleSelectTab = (tab: ScreenTab) => {
-    const targetTab = tab === 'profile' ? 'dashboard' : tab;
-    setActiveTab(targetTab);
-    const targetPath = getPathForTab(targetTab);
+    setActiveTab(tab);
+    const targetPath = getPathForTab(tab);
     if (typeof window !== 'undefined' && window.location.pathname !== targetPath) {
       window.history.pushState(null, '', targetPath);
     }
@@ -80,12 +89,6 @@ export default function App() {
     };
 
     window.addEventListener('popstate', handlePopState);
-
-    // Normalize legacy /profile alias to /dashboard
-    if (window.location.pathname.toLowerCase() === '/profile') {
-      window.history.replaceState(null, '', '/dashboard');
-    }
-
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
@@ -143,6 +146,8 @@ export default function App() {
     handleSelectTab('auth');
   };
 
+  const is3DDashboard = activeTab === 'dashboard' || activeTab === 'home';
+
   return (
     <div className="min-h-screen bg-page space-backdrop text-navy flex flex-col font-sans selection:bg-accent-tint selection:text-accent">
       {/* 1. TOP APP BAR CONTRACT */}
@@ -164,22 +169,24 @@ export default function App() {
       )}
 
       {/* 3. MAIN WORKSPACE VIEWPORT */}
-      {activeTab === 'home' ? (
+      {is3DDashboard ? (
+        /* Dashboard ONLY includes the full-screen 3D scene */
         <main className="flex-1 w-full h-[calc(100vh-60px)] overflow-hidden relative">
           <HomePage onNavigate={handleSelectTab} />
         </main>
       ) : (
+        /* All other views (Profile, Camp, Lecture, etc.) */
         <main className="flex-1 max-w-7xl w-full mx-auto px-4 md:px-8 py-6 pb-32">
           {!currentUser ? (
             <AuthView
               currentUser={null}
               onAuthSuccess={handleAuthSuccess}
               onLogout={handleLogout}
-              onNavigateHome={() => handleSelectTab('home')}
+              onNavigateHome={() => handleSelectTab('dashboard')}
             />
           ) : (
             <>
-              {(activeTab === 'dashboard' || activeTab === 'profile') && (
+              {activeTab === 'profile' && (
                 <ProfileView
                   user={currentUser}
                   stats={stats}
@@ -263,7 +270,7 @@ export default function App() {
       )}
 
       {/* 4. DOCKED FIELD CASSETTE / AUDIO RECAP PLAYER */}
-      {currentUser && activeTab !== 'auth' && activeTab !== 'home' && <AudioPlayerDock />}
+      {currentUser && activeTab !== 'auth' && !is3DDashboard && <AudioPlayerDock />}
     </div>
   );
 }
