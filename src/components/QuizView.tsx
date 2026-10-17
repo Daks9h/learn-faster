@@ -14,6 +14,7 @@ import { ScoutMark } from './Illustrations';
 
 interface QuizViewProps {
   material: StudyMaterial | null;
+  isDemoActive?: boolean;
   onEarnXp: (amount: number) => void;
   onCompleteQuiz: () => void;
   onGoToLecture?: () => void;
@@ -21,6 +22,7 @@ interface QuizViewProps {
 
 export const QuizView: React.FC<QuizViewProps> = ({ 
   material, 
+  isDemoActive = false,
   onEarnXp, 
   onCompleteQuiz,
   onGoToLecture 
@@ -34,8 +36,8 @@ export const QuizView: React.FC<QuizViewProps> = ({
   if (!material) {
     return (
       <div className="max-w-3xl mx-auto py-12">
-        <div className="bg-surface border-2 border-border-dark rounded-2xl p-8 shadow-ink text-center space-y-4">
-          <div className="w-12 h-12 rounded-xl bg-accent-tint border-2 border-border-dark mx-auto flex items-center justify-center shadow-ink-sm">
+        <div className="bg-surface border-2 border-border-dark p-8 shadow-ink text-center space-y-4">
+          <div className="w-12 h-12 bg-accent-tint border-2 border-border-dark mx-auto flex items-center justify-center shadow-ink-sm">
             <HelpCircle className="w-6 h-6 text-accent" />
           </div>
           <h2 className="font-display font-black text-xl text-navy">No Quiz Arena Available</h2>
@@ -44,11 +46,44 @@ export const QuizView: React.FC<QuizViewProps> = ({
           </p>
           <button
             onClick={onGoToLecture}
-            className="px-5 py-2.5 rounded-xl bg-accent hover:bg-accent-hover text-white font-display font-black text-xs md:text-sm border-2 border-border-dark shadow-ink hover:translate-x-0.5 hover:translate-y-0.5 transition-all inline-flex items-center gap-2"
+            className="px-5 py-2.5 bg-accent hover:bg-accent-hover text-white font-display font-black text-xs md:text-sm border-2 border-border-dark shadow-ink hover:translate-x-0.5 hover:translate-y-0.5 transition-all inline-flex items-center gap-2"
           >
             <span>Go to Lecture Tab</span>
             <ArrowRight className="w-4 h-4" />
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  // For real user custom lectures & YouTube links, quiz generation is bypassed for faster speed:
+  if (!isDemoActive || !material.quiz || material.quiz.length === 0) {
+    return (
+      <div className="max-w-2xl mx-auto py-12">
+        <div className="bg-surface border-2 border-border-dark p-8 shadow-ink text-center space-y-4">
+          <div className="w-14 h-14 bg-accent-tint border-2 border-border-dark mx-auto flex items-center justify-center shadow-ink-sm">
+            <HelpCircle className="w-7 h-7 text-accent" />
+          </div>
+          <div className="space-y-1.5">
+            <span className="px-2.5 py-0.5 text-[10px] font-mono font-bold bg-accent-tint border border-border-dark text-accent uppercase tracking-wider">
+              Quiz Arena
+            </span>
+            <h2 className="font-display font-black text-2xl text-navy">
+              Work in progress, in the next update
+            </h2>
+          </div>
+          <p className="text-xs sm:text-sm text-secondary max-w-md mx-auto leading-relaxed">
+            Live combat quiz generation for custom lectures and YouTube links is currently being upgraded for ultra-fast performance. In the meantime, explore your synthesized Key Concepts, Exam Radar, and Active Recall Flashcards!
+          </p>
+          <div className="pt-2 flex justify-center">
+            <button
+              onClick={onGoToLecture}
+              className="px-5 py-2.5 bg-accent hover:bg-accent-hover text-white font-display font-black text-xs md:text-sm border-2 border-border-dark shadow-ink hover:translate-x-0.5 hover:translate-y-0.5 transition-all inline-flex items-center gap-2"
+            >
+              <span>Explore Synthesized Lecture</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
     );

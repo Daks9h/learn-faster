@@ -484,10 +484,12 @@ app.post('/api/analyze', async (req: Request, res: Response): Promise<void> => {
       id: `fc-${i + 1}`,
     }));
 
-    const quizWithIds = validData.quiz.map((q, i) => ({
-      ...q,
-      id: `qz-${i + 1}`,
-    }));
+    const quizWithIds = Array.isArray(validData.quiz)
+      ? validData.quiz.map((q, i) => ({
+          ...q,
+          id: `qz-${i + 1}`,
+        }))
+      : [];
 
     // Server computes compression metrics
     const compression = computeCompression(

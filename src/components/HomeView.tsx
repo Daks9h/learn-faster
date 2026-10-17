@@ -58,7 +58,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
     : "Ready for Intake · +50 XP Reward";
 
   const questButtonText = material || isDemoActive ? "RESUME QUEST" : "START INTAKE";
-  const handleQuestAction = () => onNavigate(material || isDemoActive ? 'quiz' : 'lecture');
+  const handleQuestAction = () => onNavigate(isDemoActive ? 'quiz' : (material ? 'radar' : 'lecture'));
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto py-2">

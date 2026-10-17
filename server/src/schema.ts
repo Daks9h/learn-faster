@@ -41,7 +41,7 @@ export const RawStudyMaterialSchema = z.object({
   keyConcepts: z.array(KeyConceptModelSchema).min(2).max(8),
   examRadar: z.array(ExamRadarModelSchema).min(2).max(10),
   flashcards: z.array(FlashcardModelSchema).min(3).max(15),
-  quiz: z.array(QuizItemModelSchema).min(2).max(10),
+  quiz: z.array(QuizItemModelSchema).optional().default([]),
 });
 
 export type RawStudyMaterial = z.infer<typeof RawStudyMaterialSchema>;
@@ -159,11 +159,13 @@ export function normalizeConceptTags(raw: RawStudyMaterial): {
     return { ...item, concept: matched || item.concept };
   });
 
-  const updatedQuiz = raw.quiz.map((item) => {
-    const matched = findClosestTitle(item.concept);
-    if (!matched) unmatched.push(`quiz item "${item.question.slice(0, 30)}..." has unknown concept: "${item.concept}"`);
-    return { ...item, concept: matched || item.concept };
-  });
+  const updatedQuiz = Array.isArray(raw.quiz)
+    ? raw.quiz.map((item) => {
+        const matched = findClosestTitle(item.concept);
+        if (!matched) unmatched.push(`quiz item "${item.question.slice(0, 30)}..." has unknown concept: "${item.concept}"`);
+        return { ...item, concept: matched || item.concept };
+      })
+    : [];
 
   if (unmatched.length > 0) {
     return { success: false, unmatched };

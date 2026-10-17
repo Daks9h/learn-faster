@@ -30,7 +30,6 @@ const PROCESSING_STEPS = [
   'Identifying key concepts',
   'Building exam radar',
   'Preparing flashcards',
-  'Creating quiz',
 ];
 
 export const LectureView: React.FC<LectureViewProps> = ({ 
@@ -485,7 +484,7 @@ export const LectureView: React.FC<LectureViewProps> = ({
             No Lecture Synthesized Yet
           </h2>
           <p className="text-xs text-secondary max-w-md mx-auto">
-            Paste lecture notes above or choose the Berkeley CS 152 Demo to generate high-yield Quick Take, Key Concepts, Exam Radar, Flashcards, and Combat Quiz.
+            Paste lecture notes above or choose the Berkeley CS 152 Demo to generate high-yield Quick Take, Key Concepts, Exam Radar, and Active Recall Flashcards.
           </p>
           <button
             type="button"

@@ -328,6 +328,7 @@ export default function App() {
               {activeTab === 'quiz' && (
                 <QuizView
                   material={material}
+                  isDemoActive={isDemoActive}
                   onEarnXp={handleEarnXp}
                   onCompleteQuiz={() => handleSelectTab('score')}
                   onGoToLecture={() => handleSelectTab('lecture')}
