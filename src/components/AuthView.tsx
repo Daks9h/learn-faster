@@ -122,8 +122,8 @@ export const AuthView: React.FC<AuthViewProps> = ({
         <div className="bg-surface border-2 border-border-dark rounded-2xl p-6 md:p-8 shadow-ink space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-border pb-6">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-accent text-white border-2 border-border-dark flex items-center justify-center font-display font-black text-xl shadow-ink-sm flex-shrink-0">
-                {currentUser.name.slice(0, 2).toUpperCase()}
+              <div className="w-14 h-14 rounded-2xl bg-accent text-white border-2 border-border-dark flex items-center justify-center shadow-ink-sm flex-shrink-0">
+                <UserIcon className="w-7 h-7 text-white" strokeWidth={2.2} />
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2">

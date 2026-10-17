@@ -12,7 +12,8 @@ import {
   Menu,
   X,
   KeyRound,
-  Home as HomeIcon
+  Home as HomeIcon,
+  User as UserIcon
 } from 'lucide-react';
 import { ScoutMark } from './Illustrations';
 
@@ -103,29 +104,19 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, onSelectTab, stats, c
             <span className="text-accent">{stats.xpCurrent} XP</span>
           </div>
 
-          {/* User Profile / Auth Badge */}
-          {currentUser ? (
-            <button
-              onClick={() => onSelectTab('profile')}
-              className={`w-8 h-8 rounded-lg border-2 border-border-dark shadow-ink-sm font-display font-black text-xs flex items-center justify-center transition-all hover:translate-x-0.5 hover:translate-y-0.5 select-none ${
-                activeTab === 'profile' ? 'bg-surface text-accent ring-2 ring-accent border-accent' : 'bg-accent text-white'
-              }`}
-              title={`${currentUser.name} (${currentUser.email}) · Scholar Profile`}
-            >
-              {currentUser.name.slice(0, 2).toUpperCase()}
-            </button>
-          ) : (
-            <button
-              onClick={() => onSelectTab('auth')}
-              className={`px-3 py-1 rounded-lg border-2 border-border-dark shadow-ink-sm font-mono text-xs font-bold flex items-center gap-1.5 transition-all ${
-                activeTab === 'auth' ? 'bg-surface text-accent ring-2 ring-accent border-accent' : 'bg-accent hover:bg-accent-hover text-white'
-              }`}
-              title="Sign in with your academic account"
-            >
-              <KeyRound className="w-3.5 h-3.5" />
-              <span>Sign In</span>
-            </button>
-          )}
+          {/* General User Profile Icon Button */}
+          <button
+            onClick={() => onSelectTab('profile')}
+            className={`w-8 h-8 rounded-lg border-2 border-border-dark shadow-ink-sm flex items-center justify-center transition-all hover:translate-x-0.5 hover:translate-y-0.5 select-none ${
+              activeTab === 'profile'
+                ? 'bg-surface text-accent ring-2 ring-accent border-accent'
+                : 'bg-accent text-white hover:bg-accent-hover'
+            }`}
+            title={currentUser ? `${currentUser.name} (${currentUser.email}) · Scholar Profile` : 'Scholar Profile'}
+            aria-label="Scholar Profile"
+          >
+            <UserIcon className="w-4 h-4 text-white" strokeWidth={2.4} />
+          </button>
 
           {/* Mobile Menu Toggle Button */}
           <button
