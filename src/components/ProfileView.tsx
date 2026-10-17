@@ -20,7 +20,6 @@ import {
   GraduationCap
 } from 'lucide-react';
 import { ScoutMark } from './Illustrations';
-import { DashboardHero } from './DashboardHero/DashboardHero';
 
 interface ProfileViewProps {
   user: User;
@@ -72,9 +71,6 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
   return (
     <div className="max-w-4xl mx-auto py-2 space-y-6">
-      {/* NEW 3D/2D SPACE HERO SECTION */}
-      <DashboardHero />
-
       {/* 1. PERSONAL SCHOLAR BANNER */}
       <section id="scholar-profile" className="bg-surface border-2 border-border-dark rounded-2xl p-6 md:p-8 shadow-ink flex flex-col md:flex-row md:items-center justify-between gap-6 scroll-mt-20">
         <div className="flex items-start sm:items-center gap-4 md:gap-5">
@@ -109,7 +105,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
         <div className="flex items-center gap-2 self-start md:self-center">
           <button
-            onClick={() => onNavigate('home')}
+            onClick={() => onNavigate('camp')}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent hover:bg-accent-hover text-white font-display font-black text-xs sm:text-sm border-2 border-border-dark shadow-ink hover:translate-x-0.5 hover:translate-y-0.5 transition-all"
           >
             <span>ENTER BASECAMP</span>
@@ -380,7 +376,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           </button>
 
           <button
-            onClick={() => onNavigate('home')}
+            onClick={() => onNavigate('camp')}
             className="px-5 py-2.5 rounded-xl bg-accent hover:bg-accent-hover text-white font-display font-black text-xs sm:text-sm border-2 border-white/40 shadow-ink hover:translate-x-0.5 hover:translate-y-0.5 transition-all flex items-center gap-2"
           >
             <span>LAUNCH BASECAMP</span>

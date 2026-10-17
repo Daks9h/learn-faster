@@ -11,7 +11,8 @@ import {
   Zap,
   Menu,
   X,
-  KeyRound
+  KeyRound,
+  LayoutDashboard
 } from 'lucide-react';
 import { ScoutMark } from './Illustrations';
 
@@ -26,7 +27,8 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, onSelectTab, stats, c
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   const navItems: { id: ScreenTab; label: string; icon: React.ElementType }[] = [
-    { id: 'home', label: 'Camp', icon: Compass },
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'camp', label: 'Camp', icon: Compass },
     { id: 'lecture', label: 'Lecture', icon: BookOpen },
     { id: 'radar', label: 'Exam Radar', icon: Radar },
     { id: 'flashcards', label: 'Flashcards', icon: Layers },
@@ -41,7 +43,10 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, onSelectTab, stats, c
         <div className="flex items-center gap-3">
           <button 
             onClick={() => onSelectTab('home')}
-            className="flex items-center gap-2.5 text-left group"
+            className={`flex items-center gap-2.5 text-left group p-1 rounded-xl transition-all ${
+              activeTab === 'home' ? 'ring-2 ring-accent/60 bg-accent-tint/30' : 'hover:opacity-95'
+            }`}
+            title="Learn Faster — Home"
           >
             <div className="w-9 h-9 rounded-lg border-2 border-border-dark bg-accent-tint flex items-center justify-center shadow-ink-sm group-hover:translate-x-0.5 group-hover:translate-y-0.5 transition-transform">
               <ScoutMark size={28} />
@@ -63,7 +68,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, onSelectTab, stats, c
         <nav className="hidden lg:flex items-center gap-1 font-display font-bold text-xs">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = activeTab === item.id;
+            const isActive = activeTab === item.id || (item.id === 'dashboard' && activeTab === 'profile');
             return (
               <button
                 key={item.id}
