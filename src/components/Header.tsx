@@ -26,6 +26,10 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ activeTab, onSelectTab, stats, currentUser, courseBadge }) => {
+  if (!currentUser) {
+    return null;
+  }
+
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   const navItems: { id: ScreenTab; label: string; icon: React.ElementType }[] = [

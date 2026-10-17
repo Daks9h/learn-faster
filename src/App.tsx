@@ -21,8 +21,10 @@ import { FlashcardsView } from './components/FlashcardsView';
 import { QuizView } from './components/QuizView';
 import { KnowledgeScoreView } from './components/KnowledgeScoreView';
 import { AuthView } from './components/AuthView';
+import { DoorLockView } from './components/DoorLockView';
 import { ProfileView } from './components/ProfileView';
 import { AudioPlayerDock } from './components/AudioPlayerDock';
+import { demoMaterial } from './data/demoLecture';
 import { authService } from './services/authService';
 import { Zap } from 'lucide-react';
 
@@ -177,10 +179,31 @@ export default function App() {
     }
   };
 
-  const handleAuthSuccess = (user: User) => {
+  const handleAuthSuccess = (user: User, isDemo = false) => {
     setCurrentUser(user);
-    triggerToast(`Welcome, ${user.name}!`);
-    handleSelectTab('home');
+    const isBerkeleyDemo = isDemo || Boolean(user.email && user.email.toLowerCase().includes('scout@berkeley.edu'));
+    setIsDemoActive(isBerkeleyDemo);
+
+    if (isBerkeleyDemo) {
+      setMaterial(demoMaterial);
+      setStats(DEMO_BERKELEY_STATS);
+      saveUserStats(user, DEMO_BERKELEY_STATS, true);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('learnfaster_active_material', JSON.stringify(demoMaterial));
+        localStorage.setItem('learnfaster_is_demo_active', 'true');
+      }
+      triggerToast('Door unlocked! Welcome, Scout (UC Berkeley)!');
+    } else {
+      const userStats = getUserStats(user, false);
+      setStats(userStats);
+      triggerToast(`Door unlocked! Welcome, ${user.name}!`);
+    }
+
+    if (activeTab === 'auth') {
+      handleSelectTab('camp');
+    } else {
+      handleSelectTab(activeTab);
+    }
   };
 
   const handleLogout = () => {
@@ -191,8 +214,8 @@ export default function App() {
       localStorage.removeItem('learnfaster_active_material');
       localStorage.removeItem('learnfaster_is_demo_active');
     }
-    triggerToast('Signed out of session');
-    handleSelectTab('auth');
+    triggerToast('Door locked. Signed out of session.');
+    handleSelectTab('camp');
   };
 
   const isHome = activeTab === 'home' || activeTab === 'dashboard';
@@ -206,9 +229,26 @@ export default function App() {
     ? (currentUser.profileSettings.targetCourse.split(/[:–-]/)[0].trim().slice(0, 14))
     : null;
 
+  // DOOR LOCK GATEWAY: If user is not authenticated, nothing in the website works or is accessible
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-page space-backdrop text-navy flex flex-col font-sans selection:bg-accent-tint selection:text-accent">
+        {toastMessage && (
+          <div className="fixed top-6 right-4 sm:right-8 z-50 animate-bounce">
+            <div className="px-3.5 py-2 rounded-xl bg-accent text-white border-2 border-border-dark shadow-ink flex items-center gap-2 text-xs font-mono font-bold">
+              <Zap className="w-4 h-4 text-accent-tint" />
+              <span>{toastMessage}</span>
+            </div>
+          </div>
+        )}
+        <DoorLockView onAuthSuccess={handleAuthSuccess} />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-page space-backdrop text-navy flex flex-col font-sans selection:bg-accent-tint selection:text-accent">
-      {/* 1. TOP APP BAR CONTRACT */}
+      {/* 1. TOP APP BAR CONTRACT (Only rendered & accessible when user is inside) */}
       <Header
         activeTab={activeTab}
         onSelectTab={handleSelectTab}
@@ -236,28 +276,19 @@ export default function App() {
       ) : (
         /* All other views (Profile, Camp, Lecture, etc.) */
         <main className="flex-1 max-w-7xl w-full mx-auto px-4 md:px-8 py-6 pb-32">
-          {activeTab === 'auth' || (activeTab === 'profile' && !currentUser) ? (
-            <AuthView
-              currentUser={currentUser}
-              onAuthSuccess={handleAuthSuccess}
+          {activeTab === 'profile' || activeTab === 'auth' ? (
+            <ProfileView
+              user={currentUser}
+              stats={stats}
+              onUpdateUser={(updated) => {
+                setCurrentUser(updated);
+                triggerToast('Profile alignment updated!');
+              }}
+              onNavigate={handleSelectTab}
               onLogout={handleLogout}
-              onNavigateHome={() => handleSelectTab('home')}
             />
           ) : (
             <>
-              {activeTab === 'profile' && currentUser && (
-                <ProfileView
-                  user={currentUser}
-                  stats={stats}
-                  onUpdateUser={(updated) => {
-                    setCurrentUser(updated);
-                    triggerToast('Profile alignment updated!');
-                  }}
-                  onNavigate={handleSelectTab}
-                  onLogout={handleLogout}
-                />
-              )}
-
               {activeTab === 'camp' && (
                 <HomeView
                   stats={stats}
