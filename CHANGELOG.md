@@ -59,9 +59,9 @@ Visual re-theming matching https://pmndrs.github.io/examples/learn-with-jason/ w
 ---
 
 ## 4. Navigation & Route Architecture (Part C)
-- **3D Dashboard Tab (`/dashboard` and `/`)**:
-  - The "Dashboard" tab is placed **first** in the top navigation: `Dashboard, Camp, Lecture, Exam Radar, Flashcards, Quiz Arena, Knowledge Map`.
-  - **Dashboard ONLY includes the 3D scene**: full-viewport (`100vh - 60px` header), non-scrolling with no content below it and no scroll cue.
+- **3D Home Tab (`/` and `/home`)**:
+  - The "Home" tab is placed **first** in the top navigation: `Home, Camp, Lecture, Exam Radar, Flashcards, Quiz Arena, Knowledge Map`.
+  - **Home ONLY includes the 3D scene**: full-viewport (`100vh - 60px` header), non-scrolling with no content below it and no scroll cue.
   - HTML overlay: Dual-tone copper "Learn" + light "Faster" heading, tagline, primary "ENTER BASECAMP" CTA button (to `/camp`), and secondary "VIEW PROFILE" CTA button (to `/profile`).
   - Corner navigation links pointing to existing routes (`CAMP` -> `/camp`, `EXAM RADAR` -> `/radar`).
 - **Scholar Profile Page (`/profile`)**:
