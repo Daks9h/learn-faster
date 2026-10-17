@@ -380,10 +380,6 @@ export const LectureView: React.FC<LectureViewProps> = ({
                     <Clock className="w-3.5 h-3.5 text-accent" />
                     <span>Elapsed: {elapsedSeconds}s</span>
                   </span>
-                  <span>•</span>
-                  <span className="text-accent font-bold">
-                    Local Qwen2.5 7B (NVIDIA RTX 3050)
-                  </span>
                 </div>
               </div>
 
