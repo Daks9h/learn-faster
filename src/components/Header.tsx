@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScreenTab, UserStats } from '../types';
+import { ScreenTab, UserStats, User } from '../types';
 import { 
   Compass, 
   BookOpen, 
@@ -10,7 +10,8 @@ import {
   Flame, 
   Zap,
   Menu,
-  X
+  X,
+  KeyRound
 } from 'lucide-react';
 import { ScoutMark } from './Illustrations';
 
@@ -18,9 +19,10 @@ interface HeaderProps {
   activeTab: ScreenTab;
   onSelectTab: (tab: ScreenTab) => void;
   stats: UserStats;
+  currentUser?: User | null;
 }
 
-export const Header: React.FC<HeaderProps> = ({ activeTab, onSelectTab, stats }) => {
+export const Header: React.FC<HeaderProps> = ({ activeTab, onSelectTab, stats, currentUser }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   const navItems: { id: ScreenTab; label: string; icon: React.ElementType }[] = [
@@ -33,7 +35,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, onSelectTab, stats })
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-surface/95 backdrop-blur-md border-b-2 border-border-dark px-4 md:px-8 py-2.5">
+    <header className="sticky top-0 z-40 bg-[#0b0a14]/90 border-b border-border-dark px-4 md:px-8 py-2.5">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
         {/* Zone 1: Single Brand Wordmark & Course Context */}
         <div className="flex items-center gap-3">
@@ -96,13 +98,29 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, onSelectTab, stats })
             <span className="text-accent">{stats.xpCurrent} XP</span>
           </div>
 
-          {/* User Profile Badge */}
-          <div 
-            className="w-8 h-8 rounded-lg bg-accent text-white border-2 border-border-dark shadow-ink-sm font-display font-black text-xs flex items-center justify-center select-none"
-            title="Daksh — Level 07 Concept Builder"
-          >
-            D7
-          </div>
+          {/* User Profile / Auth Badge */}
+          {currentUser ? (
+            <button
+              onClick={() => onSelectTab('profile')}
+              className={`w-8 h-8 rounded-lg border-2 border-border-dark shadow-ink-sm font-display font-black text-xs flex items-center justify-center transition-all hover:translate-x-0.5 hover:translate-y-0.5 select-none ${
+                activeTab === 'profile' ? 'bg-navy text-white ring-2 ring-accent' : 'bg-accent text-white'
+              }`}
+              title={`${currentUser.name} (${currentUser.email}) · Scholar Profile`}
+            >
+              {currentUser.name.slice(0, 2).toUpperCase()}
+            </button>
+          ) : (
+            <button
+              onClick={() => onSelectTab('auth')}
+              className={`px-3 py-1 rounded-lg border-2 border-border-dark shadow-ink-sm font-mono text-xs font-bold flex items-center gap-1.5 transition-all ${
+                activeTab === 'auth' ? 'bg-navy text-white' : 'bg-accent hover:bg-accent-hover text-white'
+              }`}
+              title="Sign in with your academic account"
+            >
+              <KeyRound className="w-3.5 h-3.5" />
+              <span>Sign In</span>
+            </button>
+          )}
 
           {/* Mobile Menu Toggle Button */}
           <button
@@ -139,6 +157,20 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, onSelectTab, stats })
               </button>
             );
           })}
+          <button
+            onClick={() => {
+              onSelectTab(currentUser ? 'profile' : 'auth');
+              setMobileMenuOpen(false);
+            }}
+            className={`px-3 py-2 rounded-lg border-2 flex items-center gap-2 text-xs font-bold transition-all ${
+              (activeTab === 'profile' || activeTab === 'auth')
+                ? 'bg-accent text-white border-border-dark shadow-ink-sm'
+                : 'bg-surface border-border-dark text-navy'
+            }`}
+          >
+            <KeyRound className="w-4 h-4" />
+            <span>{currentUser ? 'Scholar Profile' : 'Sign In'}</span>
+          </button>
         </div>
       )}
     </header>

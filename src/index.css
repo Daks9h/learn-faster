@@ -5,47 +5,57 @@
   --font-sans: 'Plus Jakarta Sans', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  /* Color tokens */
-  --color-page: #FAF5E9;
-  --color-surface: #FFFCF3;
-  --color-border: #E8DFC8;
-  --color-border-dark: #14213D;
-  --color-navy: #14213D;
-  --color-secondary: #5B6783;
-  --color-accent: #2347B5;
-  --color-accent-hover: #1B3A94;
-  --color-accent-tint: #E3EAF8;
-  --color-correct: #2F7D5B;
-  --color-incorrect: #B3402F;
+  /* Color tokens - Deep space theme matching Learn with Jason reference */
+  --color-page: #0b0a14;
+  --color-surface: rgba(20, 16, 36, 0.85);
+  --color-surface-solid: #141024;
+  --color-surface-reading: rgba(18, 14, 32, 0.96);
+  --color-border: rgba(180, 160, 220, 0.22);
+  --color-border-dark: rgba(200, 180, 245, 0.35);
+  --color-navy: #f3effa;
+  --color-secondary: #a39cb8;
+  --color-accent: #c9813c;
+  --color-accent-hover: #b57130;
+  --color-accent-tint: rgba(201, 129, 60, 0.18);
+  --color-correct: #34d399;
+  --color-correct-tint: rgba(52, 211, 153, 0.18);
+  --color-incorrect: #f87171;
+  --color-incorrect-tint: rgba(239, 68, 68, 0.22);
+  --color-copper: #c9813c;
 }
 
 @layer base {
   body {
     font-family: var(--font-sans);
-    color: #14213D;
-    background-color: #FAF5E9;
+    color: var(--color-navy);
+    background-color: #0b0a14;
+    background-image: 
+      radial-gradient(ellipse 90% 45% at 50% 100%, rgba(135, 55, 64, 0.22) 0%, rgba(63, 12, 88, 0.14) 45%, transparent 75%),
+      linear-gradient(180deg, #0b0a14 0%, #120e24 45%, #1a142e 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
-    color: #14213D;
+    color: var(--color-navy);
   }
 }
 
-/* Custom editorial shadow tokens with navy ink */
+/* Custom editorial shadow tokens with soft purple glow ink */
 .shadow-ink-sm {
-  box-shadow: 2px 2px 0px #14213D;
+  box-shadow: 2px 2px 0px rgba(140, 110, 210, 0.4);
 }
 
 .shadow-ink {
-  box-shadow: 3px 3px 0px #14213D;
+  box-shadow: 3px 3px 0px rgba(140, 110, 210, 0.4);
 }
 
 .shadow-ink-lg {
-  box-shadow: 4px 4px 0px #14213D;
+  box-shadow: 4px 4px 0px rgba(140, 110, 210, 0.45);
 }
 
 .shadow-ink-press {
-  box-shadow: 1px 1px 0px #14213D;
+  box-shadow: 1px 1px 0px rgba(140, 110, 210, 0.35);
 }
 
 /* 3D Flip Card Effect */
@@ -63,9 +73,32 @@
   transform: rotateY(180deg);
 }
 
-/* Subtle architectural dot grid */
+/* Pure CSS space backdrop with static star pattern for all pages */
+.space-backdrop {
+  background-color: #0b0a14;
+  background-image: 
+    radial-gradient(ellipse 80% 40% at 50% 100%, rgba(135, 55, 64, 0.22) 0%, rgba(63, 12, 88, 0.14) 45%, transparent 75%),
+    radial-gradient(1px 1px at 30px 45px, rgba(255, 255, 255, 0.65), transparent),
+    radial-gradient(1px 1px at 110px 140px, rgba(255, 255, 255, 0.45), transparent),
+    radial-gradient(1.5px 1.5px at 190px 70px, rgba(255, 220, 180, 0.75), transparent),
+    radial-gradient(1px 1px at 280px 210px, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 370px 105px, rgba(255, 255, 255, 0.55), transparent),
+    radial-gradient(1.5px 1.5px at 460px 250px, rgba(215, 190, 255, 0.65), transparent),
+    linear-gradient(180deg, #0b0a14 0%, #120e24 45%, #1a142e 100%);
+  background-size: 
+    100% 100%,
+    450px 450px,
+    450px 450px,
+    450px 450px,
+    450px 450px,
+    450px 450px,
+    450px 450px,
+    100% 100%;
+}
+
+/* Architectural dot grid with subtle purple space dots */
 .bg-notebook-dots {
-  background-color: #FAF5E9;
-  background-image: radial-gradient(#E8DFC8 1px, transparent 1px);
+  background-color: #0b0a14;
+  background-image: radial-gradient(rgba(180, 160, 220, 0.16) 1px, transparent 1px);
   background-size: 20px 20px;
 }

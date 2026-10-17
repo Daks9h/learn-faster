@@ -76,44 +76,41 @@ export const AudioPlayerDock: React.FC = () => {
       <div className="fixed bottom-3 right-4 z-40">
         <button
           onClick={() => setIsMinimized(false)}
-          className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-[#FFFDF9] border-2 border-[#1C1A17] shadow-ink hover:translate-y-[-2px] transition-all font-mono text-xs font-bold"
+          className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-surface border-2 border-border-dark shadow-ink hover:translate-y-[-2px] transition-all font-mono text-xs font-bold text-navy"
         >
-          <span className="w-2.5 h-2.5 rounded-full bg-[#E85D26] animate-pulse" />
+          <span className="w-2.5 h-2.5 rounded-full bg-accent animate-pulse" />
           <span>Field Cassette (03:10)</span>
-          <ChevronUp className="w-4 h-4 text-[#8C867A]" />
+          <ChevronUp className="w-4 h-4 text-secondary" />
         </button>
       </div>
     );
   }
 
   return (
-    <footer className="fixed bottom-0 left-0 right-0 z-40 bg-[#FFFDF9]/95 backdrop-blur-md border-t-2 border-[#1C1A17] px-4 md:px-8 py-2.5 shadow-ink-lg transition-all">
+    <footer className="fixed bottom-0 left-0 right-0 z-40 bg-[#0b0a14]/95 border-t-2 border-border-dark px-4 md:px-8 py-2.5 shadow-ink-lg transition-all">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
         {/* Left: Cassette Identity & Topic */}
         <div className="flex items-center justify-between w-full md:w-auto gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-[#FEF3C7] border-2 border-[#1C1A17] flex items-center justify-center flex-shrink-0 shadow-ink-sm">
+            <div className="w-10 h-10 rounded-lg bg-accent-tint border-2 border-border-dark flex items-center justify-center flex-shrink-0 shadow-ink-sm">
               <CassetteDeckIllustration />
             </div>
 
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
-                <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-black bg-[#E85D26] text-white border border-[#1C1A17]">
+                <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-black bg-accent text-white border border-border-dark">
                   TAPE 04
                 </span>
-                <span className="text-xs font-display font-black text-[#1C1A17] truncate max-w-[200px] sm:max-w-xs">
+                <span className="text-xs font-display font-black text-navy truncate max-w-[200px] sm:max-w-xs">
                   {currentChapter.title}
                 </span>
               </div>
-              <span className="text-[10px] font-mono text-[#6B665E]">
-                Prof. Krste Asanović · Commute High-Yield (03:10 min)
-              </span>
             </div>
           </div>
 
           <button
             onClick={() => setIsMinimized(true)}
-            className="md:hidden p-1 rounded-lg border border-[#1C1A17]"
+            className="md:hidden p-1 rounded-lg border border-border-dark text-navy"
             title="Minimize Player"
           >
             <ChevronDown className="w-4 h-4" />
@@ -122,20 +119,20 @@ export const AudioPlayerDock: React.FC = () => {
 
         {/* Center: Waveform Scrubber & Time */}
         <div className="flex items-center gap-3 w-full md:w-2/5">
-          <span className="text-xs font-mono text-[#6B665E] w-10 text-right">
+          <span className="text-xs font-mono text-secondary w-10 text-right">
             {formatTime(currentTimeSec)}
           </span>
 
           <div className="flex-1 flex flex-col gap-1">
-            <div className="flex items-center gap-1 h-4 px-1.5 bg-[#FAF8F5] rounded border border-[#1C1A17]/40">
+            <div className="flex items-center gap-1 h-4 px-1.5 bg-page rounded border border-border-dark/40">
               {/* Equalizer Waveform bars */}
               {[4, 8, 12, 6, 14, 10, 8, 14, 6, 12, 10, 6, 14, 8, 4].map((h, i) => (
                 <span
                   key={i}
                   className={`flex-1 rounded-full transition-all duration-300 ${
                     i <= Math.floor((currentTimeSec / totalDurationSec) * 15)
-                      ? 'bg-[#2D6A4F]'
-                      : 'bg-[#1C1A17]/20'
+                      ? 'bg-accent'
+                      : 'bg-navy/20'
                   } ${isPlaying ? 'animate-pulse' : ''}`}
                   style={{ height: isPlaying ? `${Math.max(4, (h * (i % 2 === 0 ? 1.2 : 0.8)))}px` : `${h}px` }}
                 />
@@ -148,11 +145,11 @@ export const AudioPlayerDock: React.FC = () => {
               max={totalDurationSec}
               value={currentTimeSec}
               onChange={handleSeek}
-              className="w-full accent-[#E85D26] h-1.5 bg-[#E2DACB] rounded-lg appearance-none cursor-pointer"
+              className="w-full accent-accent h-1.5 bg-border rounded-lg appearance-none cursor-pointer"
             />
           </div>
 
-          <span className="text-xs font-mono text-[#6B665E] w-10">
+          <span className="text-xs font-mono text-secondary w-10">
             {formatTime(totalDurationSec)}
           </span>
         </div>
@@ -160,15 +157,15 @@ export const AudioPlayerDock: React.FC = () => {
         {/* Right: Playback Controls & Speed */}
         <div className="flex items-center justify-between w-full md:w-auto gap-3">
           {/* Speed Selector */}
-          <div className="flex items-center bg-[#FAF8F5] rounded-lg border border-[#1C1A17] p-0.5 font-mono text-xs font-bold">
+          <div className="flex items-center bg-page rounded-lg border border-border-dark p-0.5 font-mono text-xs font-bold">
             {[1, 1.5, 2].map((spd) => (
               <button
                 key={spd}
                 onClick={() => setPlaybackSpeed(spd)}
                 className={`px-2 py-0.5 rounded transition-all ${
                   playbackSpeed === spd
-                    ? 'bg-[#E85D26] text-white'
-                    : 'text-[#6B665E] hover:text-[#1C1A17]'
+                    ? 'bg-accent text-white'
+                    : 'text-secondary hover:text-navy'
                 }`}
               >
                 {spd}x
@@ -180,7 +177,7 @@ export const AudioPlayerDock: React.FC = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => handleSkip10(false)}
-              className="p-1.5 rounded-lg border border-[#1C1A17] hover:bg-[#F3EFEA] text-[#1C1A17]"
+              className="p-1.5 rounded-lg border border-border-dark hover:bg-page text-navy"
               title="Rewind 10s"
             >
               <RotateCcw className="w-4 h-4" />
@@ -188,7 +185,7 @@ export const AudioPlayerDock: React.FC = () => {
 
             <button
               onClick={() => setIsPlaying(!isPlaying)}
-              className="w-9 h-9 rounded-xl bg-[#E85D26] hover:bg-[#D04F18] text-white border-2 border-[#1C1A17] shadow-ink-sm flex items-center justify-center transition-all hover:translate-x-0.5 hover:translate-y-0.5"
+              className="w-9 h-9 rounded-xl bg-accent hover:bg-accent-hover text-white border-2 border-border-dark shadow-ink-sm flex items-center justify-center transition-all hover:translate-x-0.5 hover:translate-y-0.5"
               title={isPlaying ? 'Pause' : 'Play'}
             >
               {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
@@ -196,7 +193,7 @@ export const AudioPlayerDock: React.FC = () => {
 
             <button
               onClick={() => handleSkip10(true)}
-              className="p-1.5 rounded-lg border border-[#1C1A17] hover:bg-[#F3EFEA] text-[#1C1A17]"
+              className="p-1.5 rounded-lg border border-border-dark hover:bg-page text-navy"
               title="Forward 10s"
             >
               <RotateCw className="w-4 h-4" />
@@ -204,7 +201,7 @@ export const AudioPlayerDock: React.FC = () => {
 
             <button
               onClick={handleNextChapter}
-              className="p-1.5 rounded-lg border border-[#1C1A17] hover:bg-[#F3EFEA] text-[#1C1A17]"
+              className="p-1.5 rounded-lg border border-border-dark hover:bg-page text-navy"
               title="Next Topic Chapter"
             >
               <SkipForward className="w-4 h-4" />
@@ -212,7 +209,7 @@ export const AudioPlayerDock: React.FC = () => {
 
             <button
               onClick={() => setIsMinimized(true)}
-              className="hidden md:inline-flex p-1.5 rounded-lg border border-[#1C1A17] hover:bg-[#F3EFEA] text-[#1C1A17]"
+              className="hidden md:inline-flex p-1.5 rounded-lg border border-border-dark hover:bg-page text-navy"
               title="Minimize Player"
             >
               <ChevronDown className="w-4 h-4" />
