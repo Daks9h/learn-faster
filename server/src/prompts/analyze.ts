@@ -66,11 +66,11 @@ JSON OUTPUT STRUCTURE:
 }
 
 SPECIFIC CONSTRAINTS:
-- "quickTake": Exactly 3 items.
-- "keyConcepts": 4 to 5 items (keep explanations to 1-2 punchy sentences, max 2 keyPoints each). Include a "table" ONLY when the lecture presents a clear tabular mapping, truth table, or state transition rule; otherwise omit "table".
-- "examRadar": Exactly 5 items. Rank priority ("very_likely", "important", "good_to_know"). The "reason" must be 1 concise sentence and never claim probabilities or percentages.
-- "flashcards": Exactly 8 cards. Keep questions and answers to 1 concise sentence each.
-- "quiz": Exactly 5 questions. Each must have exactly 4 plausible options, with "correctAnswer" being a number 0 to 3. Explanation must be 1 concise sentence.
+- "quickTake": Exactly 3 concise items.
+- "keyConcepts": 3 to 4 items (1-2 punchy sentences each, max 2 keyPoints each). Include a "table" ONLY when the lecture presents a clear tabular mapping, truth table, or state transition rule; otherwise omit "table".
+- "examRadar": 3 to 4 items. Rank priority ("very_likely", "important", "good_to_know"). The "reason" must be 1 concise sentence and never claim probabilities or percentages.
+- "flashcards": 4 to 5 cards. Keep questions and answers to 1 concise sentence each.
+- "quiz": 3 to 4 questions. Each must have exactly 4 plausible options, with "correctAnswer" being an integer 0 to 3. Explanation must be 1 concise sentence.
 - EVERY item in "examRadar", "flashcards", and "quiz" MUST have a "concept" field that EXACTLY matches one of the "title" strings in "keyConcepts".
 `;
 }

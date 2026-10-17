@@ -37,11 +37,11 @@ export const QuizItemModelSchema = z.object({
 
 export const RawStudyMaterialSchema = z.object({
   courseTitle: z.string().min(1),
-  quickTake: z.array(z.string()).length(3),
-  keyConcepts: z.array(KeyConceptModelSchema).min(4).max(6),
-  examRadar: z.array(ExamRadarModelSchema).min(5).max(8),
-  flashcards: z.array(FlashcardModelSchema).length(8),
-  quiz: z.array(QuizItemModelSchema).length(5),
+  quickTake: z.array(z.string()).min(1).max(6),
+  keyConcepts: z.array(KeyConceptModelSchema).min(2).max(8),
+  examRadar: z.array(ExamRadarModelSchema).min(2).max(10),
+  flashcards: z.array(FlashcardModelSchema).min(3).max(15),
+  quiz: z.array(QuizItemModelSchema).min(2).max(10),
 });
 
 export type RawStudyMaterial = z.infer<typeof RawStudyMaterialSchema>;

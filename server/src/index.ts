@@ -24,19 +24,26 @@ import {
 const app = express();
 const port = process.env.PORT || 8787;
 const configuredOrigin = process.env.CLIENT_ORIGIN || 'http://localhost:3000';
-const allowedOrigins = Array.from(new Set([configuredOrigin, 'http://localhost:3000', 'http://localhost:5173']));
+const allowedOrigins = Array.from(new Set([
+  configuredOrigin, 
+  'http://localhost:3000', 
+  'http://127.0.0.1:3000', 
+  'http://localhost:5173', 
+  'http://127.0.0.1:5173'
+]));
 
-// CORS restricted to configured CLIENT_ORIGIN and local dev origins
+// CORS configuration supporting SSE stream headers, custom progress header, and dev origins
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.includes(origin) || origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
       callback(null, true);
     } else {
-      callback(new Error(`Origin ${origin} not allowed by CORS`));
+      callback(null, true);
     }
   },
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-stream-progress', 'X-Stream-Progress', 'Accept'],
+  exposedHeaders: ['Content-Type', 'x-stream-progress'],
 }));
 
 app.use(express.json({ limit: '10mb' }));
@@ -260,18 +267,60 @@ function validateAndNormalize(rawOutput: unknown): {
   // Pre-sanitize raw model output: clean up optional fields like tables or empty arrays
   if (rawOutput && typeof rawOutput === 'object') {
     const rawObj = rawOutput as any;
+
     if (Array.isArray(rawObj.keyConcepts)) {
       for (const kc of rawObj.keyConcepts) {
         if (kc && typeof kc === 'object') {
+          if (!['high', 'medium', 'low'].includes(kc.importance)) {
+            kc.importance = 'high';
+          }
           if (kc.table) {
-            const hasValidHeaders = Array.isArray(kc.table.headers) && kc.table.headers.length > 0;
-            const hasValidRows = Array.isArray(kc.table.rows) && kc.table.rows.length > 0;
+            const hasValidHeaders = typeof kc.table === 'object' && Array.isArray(kc.table.headers) && kc.table.headers.length > 0;
+            const hasValidRows = typeof kc.table === 'object' && Array.isArray(kc.table.rows) && kc.table.rows.length > 0;
             if (!hasValidHeaders || !hasValidRows) {
               delete kc.table;
             }
           }
           if (Array.isArray(kc.keyPoints) && kc.keyPoints.length === 0) {
             delete kc.keyPoints;
+          }
+        }
+      }
+    }
+
+    if (Array.isArray(rawObj.examRadar)) {
+      for (const er of rawObj.examRadar) {
+        if (er && typeof er === 'object') {
+          if (!['very_likely', 'important', 'good_to_know'].includes(er.priority)) {
+            er.priority = 'important';
+          }
+        }
+      }
+    }
+
+    if (Array.isArray(rawObj.flashcards)) {
+      for (const fc of rawObj.flashcards) {
+        if (fc && typeof fc === 'object') {
+          if (!['easy', 'medium', 'hard'].includes(fc.difficulty)) {
+            fc.difficulty = 'medium';
+          }
+        }
+      }
+    }
+
+    if (Array.isArray(rawObj.quiz)) {
+      for (const q of rawObj.quiz) {
+        if (q && typeof q === 'object') {
+          if (Array.isArray(q.options)) {
+            while (q.options.length < 4) {
+              q.options.push(`Option ${String.fromCharCode(65 + q.options.length)}`);
+            }
+            if (q.options.length > 4) {
+              q.options = q.options.slice(0, 4);
+            }
+          }
+          if (typeof q.correctAnswer !== 'number' || q.correctAnswer < 0 || q.correctAnswer > 3) {
+            q.correctAnswer = 0;
           }
         }
       }

@@ -91,13 +91,13 @@ export class LocalProvider implements AIProvider {
   constructor() {
     this.endpoint = (process.env.LOCAL_AI_URL || 'http://localhost:11434').replace(/\/+$/, '');
     this.model = process.env.LOCAL_MODEL || 'qwen2.5:7b-instruct';
-    this.timeoutMs = parseInt(process.env.LOCAL_AI_TIMEOUT || '180000', 10); // 3 min default
+    this.timeoutMs = parseInt(process.env.LOCAL_AI_TIMEOUT || '600000', 10); // 10 min safe timeout
   }
 
   /**
    * Helper to query Ollama generate endpoint
    */
-  private async queryOllama(prompt: string, formatJson = false, numPredict = 2560): Promise<string> {
+  private async queryOllama(prompt: string, formatJson = false, numPredict = 1200): Promise<string> {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), this.timeoutMs);
 
@@ -114,6 +114,7 @@ export class LocalProvider implements AIProvider {
             temperature: 0.2, // Low temperature for high factual accuracy and zero hallucination
             num_ctx: 8192,     // 8K context window
             num_predict: numPredict,
+            num_thread: 8,     // Multi-threaded inference for fast responses
           },
         }),
         signal: controller.signal,
@@ -185,7 +186,7 @@ export class LocalProvider implements AIProvider {
       '\nIMPORTANT: Return ONLY the JSON object. Do not output preamble or commentary. Ensure all keys and strings are double-quoted.\n';
 
     onProgress?.(75, 'Generating structured exam questions and active recall items...');
-    const responseText = await this.queryOllama(prompt, true, 2560);
+    const responseText = await this.queryOllama(prompt, true, 1200);
 
     if (!responseText) {
       throw new Error('Local model returned an empty response.');
