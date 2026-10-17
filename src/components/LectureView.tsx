@@ -267,7 +267,7 @@ export const LectureView: React.FC<LectureViewProps> = ({
 
         {/* ERROR STATE CARD (Inline visual style with Try Again and Use Demo) */}
         {status === 'error' && (
-          <div className="mt-5 p-4 md:p-5 bg-[#FBEBE8] border-2 border-border-dark rounded-xl shadow-ink space-y-3">
+          <div className="mt-5 p-4 md:p-5 bg-incorrect-tint border-2 border-border-dark rounded-xl shadow-ink space-y-3">
             <div className="flex items-start gap-3">
               <div className="w-9 h-9 rounded-lg bg-incorrect text-white border-2 border-border-dark flex items-center justify-center flex-shrink-0 shadow-ink-sm">
                 <AlertTriangle className="w-5 h-5" />
@@ -406,7 +406,7 @@ export const LectureView: React.FC<LectureViewProps> = ({
 
       {/* 2. QUICK TAKE (3-BULLET CORE SUMMARY) */}
       {material && !isProcessing && (
-        <section className="bg-surface border-2 border-border-dark rounded-2xl p-5 md:p-6 shadow-ink space-y-3">
+        <section className="bg-[#141026] border-2 border-border-dark rounded-2xl p-5 md:p-6 shadow-ink space-y-3">
           <div className="flex items-center justify-between border-b-2 border-border pb-3">
             <div className="flex items-center gap-2">
               <span className="text-xs font-mono font-black uppercase text-accent px-2 py-0.5 rounded bg-accent-tint border border-border-dark">
@@ -438,7 +438,7 @@ export const LectureView: React.FC<LectureViewProps> = ({
 
       {/* 3. KEY ARCHITECTURAL CONCEPTS & TRUTH TABLE */}
       {material && !isProcessing && (
-        <section className="bg-surface border-2 border-border-dark rounded-2xl p-5 md:p-6 shadow-ink space-y-4">
+        <section className="bg-[#141026] border-2 border-border-dark rounded-2xl p-5 md:p-6 shadow-ink space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-border pb-3">
             <div>
               <h2 className="font-display font-black text-base md:text-lg text-navy">
@@ -449,7 +449,7 @@ export const LectureView: React.FC<LectureViewProps> = ({
             <button
               type="button"
               onClick={onOpenRadar}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent-tint hover:bg-[#D5E1F5] border-2 border-border-dark text-xs font-display font-bold text-navy shadow-ink-press"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent-tint hover:bg-border border-2 border-border-dark text-xs font-display font-bold text-navy shadow-ink-press"
             >
               <span>See Exam Probability On Radar</span>
               <ArrowRight className="w-3.5 h-3.5 text-accent" />

@@ -164,7 +164,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
       </div>
 
       {/* 2. QUESTION STATEMENT */}
-      <div className="bg-surface border-2 border-border-dark rounded-2xl p-5 sm:p-6 shadow-ink space-y-3">
+      <div className="bg-[#141026] border-2 border-border-dark rounded-2xl p-5 sm:p-6 shadow-ink space-y-3">
         <div className="flex items-center justify-between text-xs font-mono">
           <span className="text-accent font-bold uppercase">
             {question.concept}
@@ -185,9 +185,9 @@ export const QuizView: React.FC<QuizViewProps> = ({
 
             if (answered) {
               if (isCorrectOption) {
-                btnStyle = 'bg-[#EAF4EE] border-[#2F7D5B] text-navy ring-2 ring-[#2F7D5B]';
+                btnStyle = 'bg-correct-tint border-correct text-navy ring-2 ring-correct';
               } else if (isSelected && !isCorrectOption) {
-                btnStyle = 'bg-[#FBEBE8] border-[#B3402F] text-navy';
+                btnStyle = 'bg-incorrect-tint border-incorrect text-navy';
               } else {
                 btnStyle = 'bg-page border-border text-secondary opacity-60';
               }
@@ -203,9 +203,9 @@ export const QuizView: React.FC<QuizViewProps> = ({
                 <span
                   className={`w-7 h-7 rounded-lg border border-border-dark flex items-center justify-center font-mono font-bold text-xs flex-shrink-0 mt-0.5 ${
                     answered && isCorrectOption
-                      ? 'bg-[#2F7D5B] text-white'
+                      ? 'bg-correct text-white'
                       : isSelected && answered && !isCorrectOption
-                      ? 'bg-[#B3402F] text-white'
+                      ? 'bg-incorrect text-white'
                       : 'bg-page text-navy'
                   }`}
                 >
@@ -217,10 +217,10 @@ export const QuizView: React.FC<QuizViewProps> = ({
                 </span>
 
                 {answered && isCorrectOption && (
-                  <CheckCircle2 className="w-5 h-5 text-[#2F7D5B] flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-5 h-5 text-correct flex-shrink-0 mt-0.5" />
                 )}
                 {answered && isSelected && !isCorrectOption && (
-                  <XCircle className="w-5 h-5 text-[#B3402F] flex-shrink-0 mt-0.5" />
+                  <XCircle className="w-5 h-5 text-incorrect flex-shrink-0 mt-0.5" />
                 )}
               </button>
             );
@@ -232,7 +232,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
       {answered && (
         <div
           className={`p-4 rounded-xl border-2 border-border-dark shadow-ink-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
-            isSelectedCorrect ? 'bg-[#EAF4EE]' : 'bg-[#FBEBE8]'
+            isSelectedCorrect ? 'bg-correct-tint' : 'bg-incorrect-tint'
           }`}
         >
           <div className="flex items-start gap-3">
@@ -245,7 +245,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
                   {isSelectedCorrect ? 'Accurate Response' : 'Hardware Correction'}
                 </span>
                 {isSelectedCorrect && (
-                  <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-[#2F7D5B] text-white">
+                  <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-correct text-white">
                     +20 XP
                   </span>
                 )}

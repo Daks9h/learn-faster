@@ -68,7 +68,7 @@ export const ExamRadarView: React.FC<ExamRadarViewProps> = ({
             </h1>
 
             <div className="pt-1 flex flex-wrap items-center gap-2 text-xs font-mono">
-              <span className="px-2.5 py-1 bg-navy text-white border border-border-dark rounded-lg font-bold flex items-center gap-1.5">
+              <span className="px-2.5 py-1 bg-accent-tint text-accent border border-accent/40 rounded-lg font-bold flex items-center gap-1.5">
                 <Flame className="w-3.5 h-3.5" />
                 <span>Very Likely</span>
               </span>
@@ -163,10 +163,10 @@ export const ExamRadarView: React.FC<ExamRadarViewProps> = ({
                     <span
                       className={`px-2.5 py-0.5 rounded text-xs font-mono font-black border border-border-dark flex items-center gap-1.5 ${
                         isVeryLikely
-                          ? 'bg-navy text-white'
+                          ? 'bg-accent-tint text-accent border border-accent/40'
                           : isImportant
                           ? 'bg-accent text-white'
-                          : 'bg-accent-tint text-navy'
+                          : 'bg-surface text-secondary'
                       }`}
                     >
                       {isVeryLikely && <Flame className="w-3.5 h-3.5" />}
@@ -196,7 +196,7 @@ export const ExamRadarView: React.FC<ExamRadarViewProps> = ({
 
                   {/* Trap Alert if present */}
                   {item.trapAlert && (
-                    <div className="p-2.5 bg-[#FBEBE8] rounded-lg border border-incorrect/40 text-xs font-mono text-incorrect flex items-center gap-2">
+                    <div className="p-2.5 bg-incorrect-tint rounded-lg border border-incorrect/40 text-xs font-mono text-incorrect flex items-center gap-2">
                       <AlertTriangle className="w-4 h-4 text-incorrect flex-shrink-0" />
                       <span>
                         <strong>Exam Trap Flagged:</strong> {item.trapAlert}

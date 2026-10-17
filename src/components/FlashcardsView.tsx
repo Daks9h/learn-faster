@@ -145,7 +145,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
             }`}
           >
             {/* FRONT OF CARD */}
-            <div className="absolute inset-0 w-full h-full bg-surface border-2 border-border-dark rounded-2xl p-6 sm:p-8 flex flex-col justify-between backface-hidden shadow-ink">
+            <div className="absolute inset-0 w-full h-full bg-[#141026] border-2 border-border-dark rounded-2xl p-6 sm:p-8 flex flex-col justify-between backface-hidden shadow-ink">
               <div>
                 <div className="flex items-center justify-between text-xs font-mono text-secondary uppercase">
                   <span className="px-2 py-0.5 rounded bg-accent-tint border border-border text-navy font-bold">
@@ -169,7 +169,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
             </div>
 
             {/* BACK OF CARD */}
-            <div className="absolute inset-0 w-full h-full bg-surface border-2 border-accent rounded-2xl p-6 sm:p-8 flex flex-col justify-between backface-hidden rotate-y-180 shadow-ink">
+            <div className="absolute inset-0 w-full h-full bg-[#141026] border-2 border-accent rounded-2xl p-6 sm:p-8 flex flex-col justify-between backface-hidden rotate-y-180 shadow-ink">
               <div>
                 <div className="flex items-center justify-between text-xs font-mono uppercase font-bold text-accent">
                   <CheckCircle2 className="w-4 h-4 text-accent" />

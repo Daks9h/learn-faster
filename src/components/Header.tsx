@@ -103,7 +103,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, onSelectTab, stats, c
             <button
               onClick={() => onSelectTab('profile')}
               className={`w-8 h-8 rounded-lg border-2 border-border-dark shadow-ink-sm font-display font-black text-xs flex items-center justify-center transition-all hover:translate-x-0.5 hover:translate-y-0.5 select-none ${
-                activeTab === 'profile' ? 'bg-navy text-white ring-2 ring-accent' : 'bg-accent text-white'
+                activeTab === 'profile' ? 'bg-surface text-accent ring-2 ring-accent border-accent' : 'bg-accent text-white'
               }`}
               title={`${currentUser.name} (${currentUser.email}) · Scholar Profile`}
             >
@@ -113,7 +113,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, onSelectTab, stats, c
             <button
               onClick={() => onSelectTab('auth')}
               className={`px-3 py-1 rounded-lg border-2 border-border-dark shadow-ink-sm font-mono text-xs font-bold flex items-center gap-1.5 transition-all ${
-                activeTab === 'auth' ? 'bg-navy text-white' : 'bg-accent hover:bg-accent-hover text-white'
+                activeTab === 'auth' ? 'bg-surface text-accent ring-2 ring-accent border-accent' : 'bg-accent hover:bg-accent-hover text-white'
               }`}
               title="Sign in with your academic account"
             >

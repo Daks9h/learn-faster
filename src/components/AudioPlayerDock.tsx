@@ -132,7 +132,7 @@ export const AudioPlayerDock: React.FC = () => {
                   className={`flex-1 rounded-full transition-all duration-300 ${
                     i <= Math.floor((currentTimeSec / totalDurationSec) * 15)
                       ? 'bg-accent'
-                      : 'bg-navy/20'
+                      : 'bg-white/20'
                   } ${isPlaying ? 'animate-pulse' : ''}`}
                   style={{ height: isPlaying ? `${Math.max(4, (h * (i % 2 === 0 ? 1.2 : 0.8)))}px` : `${h}px` }}
                 />
