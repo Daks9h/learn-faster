@@ -22,7 +22,7 @@ import { Zap } from 'lucide-react';
 
 function getTabFromPath(path: string): ScreenTab {
   const cleanPath = path.toLowerCase().replace(/\/$/, '') || '/';
-  if (cleanPath === '/' || cleanPath === '/dashboard' || cleanPath === '/home') return 'dashboard';
+  if (cleanPath === '/' || cleanPath === '/home' || cleanPath === '/dashboard') return 'home';
   if (cleanPath === '/profile') return 'profile';
   if (cleanPath === '/camp' || cleanPath === '/basecamp') return 'camp';
   if (cleanPath === '/lecture') return 'lecture';
@@ -31,14 +31,14 @@ function getTabFromPath(path: string): ScreenTab {
   if (cleanPath === '/quiz' || cleanPath === '/quiz-arena') return 'quiz';
   if (cleanPath === '/score' || cleanPath === '/knowledge-map') return 'score';
   if (cleanPath === '/auth') return 'auth';
-  return 'dashboard';
+  return 'home';
 }
 
 function getPathForTab(tab: ScreenTab): string {
   switch (tab) {
-    case 'dashboard':
     case 'home':
-      return '/dashboard';
+    case 'dashboard':
+      return '/';
     case 'profile':
       return '/profile';
     case 'camp':
@@ -56,7 +56,7 @@ function getPathForTab(tab: ScreenTab): string {
     case 'auth':
       return '/auth';
     default:
-      return '/dashboard';
+      return '/';
   }
 }
 
@@ -66,7 +66,7 @@ export default function App() {
     if (typeof window !== 'undefined') {
       return getTabFromPath(window.location.pathname);
     }
-    return 'dashboard';
+    return 'home';
   });
   const [material, setMaterial] = useState<StudyMaterial | null>(null);
   const [status, setStatus] = useState<'idle' | 'processing' | 'ready' | 'error'>('idle');
@@ -135,8 +135,8 @@ export default function App() {
   const handleAuthSuccess = (user: User) => {
     setCurrentUser(user);
     triggerToast(`Welcome, ${user.name}!`);
-    // Post-login redirect points directly to Dashboard (/dashboard)
-    handleSelectTab('dashboard');
+    // Post-login redirect points directly to Home (/)
+    handleSelectTab('home');
   };
 
   const handleLogout = () => {
@@ -146,7 +146,7 @@ export default function App() {
     handleSelectTab('auth');
   };
 
-  const is3DDashboard = activeTab === 'dashboard' || activeTab === 'home';
+  const isHome = activeTab === 'home' || activeTab === 'dashboard';
 
   return (
     <div className="min-h-screen bg-page space-backdrop text-navy flex flex-col font-sans selection:bg-accent-tint selection:text-accent">
@@ -169,8 +169,8 @@ export default function App() {
       )}
 
       {/* 3. MAIN WORKSPACE VIEWPORT */}
-      {is3DDashboard ? (
-        /* Dashboard ONLY includes the full-screen 3D scene */
+      {isHome ? (
+        /* Home ONLY includes the full-screen 3D scene */
         <main className="flex-1 w-full h-[calc(100vh-60px)] overflow-hidden relative">
           <HomePage onNavigate={handleSelectTab} />
         </main>
@@ -182,7 +182,7 @@ export default function App() {
               currentUser={null}
               onAuthSuccess={handleAuthSuccess}
               onLogout={handleLogout}
-              onNavigateHome={() => handleSelectTab('dashboard')}
+              onNavigateHome={() => handleSelectTab('home')}
             />
           ) : (
             <>
@@ -270,7 +270,7 @@ export default function App() {
       )}
 
       {/* 4. DOCKED FIELD CASSETTE / AUDIO RECAP PLAYER */}
-      {currentUser && activeTab !== 'auth' && !is3DDashboard && <AudioPlayerDock />}
+      {currentUser && activeTab !== 'auth' && !isHome && <AudioPlayerDock />}
     </div>
   );
 }
