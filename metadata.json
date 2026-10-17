@@ -1,5 +1,5 @@
 {
-  "name": "LectureAI",
+  "name": "Learn Faster",
   "description": "AI Lecture-to-Exam Assistant. Turn 60 minutes of lecture into 10 minutes of understanding with high-yield synthesis, exam radar predictions, and targeted revision.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

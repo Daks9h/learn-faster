@@ -49,7 +49,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, onSelectTab, stats, c
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-display font-black text-lg tracking-tight text-navy">
-                  LectureAI
+                  Learn Faster
                 </span>
                 <span className="hidden sm:inline-block text-[11px] font-mono font-semibold text-secondary">
                   CS 152

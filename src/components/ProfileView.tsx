@@ -135,7 +135,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             </div>
             <div>
               <h2 className="font-display font-black text-base md:text-lg text-navy">
-                LectureAI Course Alignment
+                Learn Faster Course Alignment
               </h2>
             </div>
           </div>

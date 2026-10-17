@@ -308,13 +308,13 @@ export const DashboardHeroCanvas: React.FC<DashboardHeroCanvasProps> = ({
             className="font-display font-black text-6xl sm:text-8xl md:text-9xl text-[#c9813c] leading-none tracking-tight drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]"
             style={{ letterSpacing: '-0.04em' }}
           >
-            LectureAI
+            Learn
           </h1>
           <span 
-            className="font-display font-light text-2xl sm:text-4xl md:text-5xl text-[#e2d8f0]/80 tracking-wide"
+            className="font-display font-light text-3xl sm:text-5xl md:text-6xl text-[#e2d8f0]/85 tracking-wide"
             style={{ letterSpacing: '-0.02em' }}
           >
-            with AI
+            Faster
           </span>
         </div>
 
@@ -328,7 +328,7 @@ export const DashboardHeroCanvas: React.FC<DashboardHeroCanvasProps> = ({
             onClick={onScrollToContent}
             className="px-6 py-3 rounded-xl bg-[#c9813c] hover:bg-[#b57130] text-white font-display font-black text-sm sm:text-base border-2 border-white/30 shadow-ink hover:translate-x-0.5 hover:translate-y-0.5 transition-all flex items-center gap-2.5 cursor-pointer pointer-events-auto"
           >
-            <span>EXPLORE SCHOLAR BASECAMP</span>
+            <span>OPEN DASHBOARD</span>
             <ArrowDown className="w-4 h-4" />
           </button>
         </div>

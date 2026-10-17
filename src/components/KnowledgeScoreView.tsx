@@ -53,7 +53,7 @@ export const KnowledgeScoreView: React.FC<KnowledgeScoreViewProps> = ({
         <div className="flex items-center justify-between border-b border-border pb-2">
           <span className="text-xs font-mono font-extrabold uppercase text-navy flex items-center gap-1.5">
             <Target className="w-4 h-4 text-accent" />
-            THE LECTUREAI LEARNING LOOP
+            THE LEARN FASTER LEARNING LOOP
           </span>
         </div>
 
