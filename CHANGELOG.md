@@ -59,26 +59,26 @@ Visual re-theming matching https://pmndrs.github.io/examples/learn-with-jason/ w
 ---
 
 ## 4. Navigation & Route Architecture (Part C)
-- **Dedicated 3D Home Page (`/`)**:
-  - Full-viewport scene (`100vh - 60px` header). Non-scrolling with no content below it and no scroll cue.
-  - HTML overlay: Dual-tone copper "Learn" + light "Faster" heading, tagline, and "OPEN DASHBOARD" CTA button.
+- **3D Dashboard Tab (`/dashboard` and `/`)**:
+  - The "Dashboard" tab is placed **first** in the top navigation: `Dashboard, Camp, Lecture, Exam Radar, Flashcards, Quiz Arena, Knowledge Map`.
+  - **Dashboard ONLY includes the 3D scene**: full-viewport (`100vh - 60px` header), non-scrolling with no content below it and no scroll cue.
+  - HTML overlay: Dual-tone copper "Learn" + light "Faster" heading, tagline, primary "ENTER BASECAMP" CTA button (to `/camp`), and secondary "VIEW PROFILE" CTA button (to `/profile`).
   - Corner navigation links pointing to existing routes (`CAMP` -> `/camp`, `EXAM RADAR` -> `/radar`).
-- **Dashboard Tab (`/dashboard`)**:
-  - Moved existing scholar dashboard (Profile card, Course Alignment, Stat cards, JWT token card, Fast Launch hub) into its own dedicated tab placed **first** in the top navigation:
-    1. **Dashboard** (`/dashboard`)
-    2. **Camp** (`/camp`)
-    3. **Lecture** (`/lecture`)
-    4. **Exam Radar** (`/radar`)
-    5. **Flashcards** (`/flashcards`)
-    6. **Quiz Arena** (`/quiz`)
-    7. **Knowledge Map** (`/score`)
-- **Route Aliasing & History**:
-  - Legacy `/profile` redirects/aliases to `/dashboard`.
-  - Existing "ENTER BASECAMP" / "LAUNCH BASECAMP" links navigate directly to `/camp`.
-  - Clicking the brand logo navigates to `/` (Home).
+- **Scholar Profile Page (`/profile`)**:
+  - Accessed via the profile avatar button (`SC`) on the top-right of the header (or `/profile`).
+  - Houses the full Scholar Profile view:
+    - Personal Scholar Banner ("Scout", "LVL 7 SCHOLAR", "JWT Verified").
+    - "Learn Faster Course Alignment" section with course settings.
+    - Scholar telemetry stat cards (Streak, XP Earned, Mastery, Weak Areas).
+    - Cryptographic JWT Session Token card.
+    - Fast Launch Hub ("ENTER BASECAMP", "Combat Quiz", "Exam Radar").
+- **Route Synchronization & History**:
+  - `/` and `/dashboard` map to the 3D Dashboard.
+  - `/profile` maps to the Scholar Profile view.
+  - `/camp` maps to the Camp view (Basecamp learning modules and Scout guidance).
   - Browser Back/Forward buttons are synchronized via `popstate`.
 - **Post-Login Redirect**:
-  - Post-login redirect continues pointing directly to Dashboard (`/dashboard`), preserving existing auth behavior. *(One-line product decision that can be switched to Home later if desired).*
+  - Post-login redirect points directly to the 3D Dashboard (`/dashboard`), preserving existing auth behavior.
 
 ---
 
