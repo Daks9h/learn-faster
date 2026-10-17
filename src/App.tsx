@@ -302,6 +302,7 @@ export default function App() {
                 <LectureView
                   material={material}
                   status={status}
+                  isDemoActive={isDemoActive}
                   onStatusChange={setStatus}
                   onMaterialLoaded={handleMaterialLoaded}
                   onExploreConcept={(id) => handleTrainTopic(id)}

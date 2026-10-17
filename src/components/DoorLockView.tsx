@@ -126,8 +126,8 @@ export const DoorLockView: React.FC<DoorLockViewProps> = ({ onAuthSuccess }) => 
           <div className="md:col-span-5 p-5 md:p-6 bg-surface-solid border-b-2 md:border-b-0 md:border-r-2 border-border-dark flex flex-col justify-between gap-4">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 bg-accent-tint border-2 border-border-dark flex items-center justify-center shadow-ink-sm flex-shrink-0">
-                  <ScoutMark size={32} />
+                <div className="w-11 h-11 bg-accent-tint/30 border-2 border-border-dark flex items-center justify-center shadow-ink-sm flex-shrink-0 overflow-hidden">
+                  <img src="/logo.png" alt="Learn Faster" className="w-8 h-8 object-contain" />
                 </div>
                 <div>
                   <h1 className="font-display font-black text-xl text-navy tracking-tight leading-tight">

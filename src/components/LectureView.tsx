@@ -18,6 +18,7 @@ import {
 interface LectureViewProps {
   material: StudyMaterial | null;
   status: 'idle' | 'processing' | 'ready' | 'error';
+  isDemoActive?: boolean;
   onStatusChange: (status: 'idle' | 'processing' | 'ready' | 'error') => void;
   onMaterialLoaded: (material: StudyMaterial, isDemo?: boolean) => void;
   onExploreConcept: (conceptId: string) => void;
@@ -35,13 +36,22 @@ const PROCESSING_STEPS = [
 export const LectureView: React.FC<LectureViewProps> = ({ 
   material, 
   status,
+  isDemoActive = false,
   onStatusChange,
   onMaterialLoaded,
   onExploreConcept, 
   onOpenRadar 
 }) => {
-  const [activeInputTab, setActiveInputTab] = useState<'yt' | 'pdf' | 'preset'>('yt');
-  const [inputValue, setInputValue] = useState('');
+  const [activeInputTab, setActiveInputTab] = useState<'yt' | 'pdf' | 'preset'>(() => isDemoActive ? 'preset' : 'yt');
+  const [inputValue, setInputValue] = useState(() => isDemoActive ? 'UC Berkeley CS 152: High-Speed Arithmetic & IEEE 754 (Demo Preset)' : '');
+
+  // Keep demo user anchored to demo preset if demo is active
+  useEffect(() => {
+    if (isDemoActive && activeInputTab !== 'preset') {
+      setActiveInputTab('preset');
+      setInputValue('UC Berkeley CS 152: High-Speed Arithmetic & IEEE 754 (Demo Preset)');
+    }
+  }, [isDemoActive]);
   const [progressPercent, setProgressPercent] = useState(0);
   const [progressStage, setProgressStage] = useState('Initializing synthesis pipeline...');
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -188,12 +198,19 @@ export const LectureView: React.FC<LectureViewProps> = ({
 
         {/* Ingestion Source Switcher */}
         <div className="mt-4">
-          <div className="flex flex-wrap items-center gap-2 p-1 bg-page rounded-xl border-2 border-border-dark w-fit text-xs font-display font-bold">
+          <div className="flex flex-wrap items-center gap-2 p-1 bg-page border-2 border-border-dark w-fit text-xs font-display font-bold">
             <button
               type="button"
-              onClick={() => handleTabChange('yt')}
-              className={`px-3 py-1.5 rounded-lg border transition-all ${
-                activeInputTab === 'yt'
+              onClick={() => {
+                if (isDemoActive) return;
+                handleTabChange('yt');
+              }}
+              disabled={isDemoActive}
+              title={isDemoActive ? "Demo access is restricted to preloaded demo lecture data" : "Analyze YouTube video"}
+              className={`px-3 py-1.5 border transition-all ${
+                isDemoActive
+                  ? 'opacity-40 cursor-not-allowed text-secondary border-transparent select-none'
+                  : activeInputTab === 'yt'
                   ? 'bg-surface text-navy border-border-dark shadow-ink-press'
                   : 'text-secondary border-transparent hover:text-navy'
               }`}
@@ -202,9 +219,16 @@ export const LectureView: React.FC<LectureViewProps> = ({
             </button>
             <button
               type="button"
-              onClick={() => handleTabChange('pdf')}
-              className={`px-3 py-1.5 rounded-lg border transition-all ${
-                activeInputTab === 'pdf'
+              onClick={() => {
+                if (isDemoActive) return;
+                handleTabChange('pdf');
+              }}
+              disabled={isDemoActive}
+              title={isDemoActive ? "Demo access is restricted to preloaded demo lecture data" : "Analyze lecture notes or transcript text"}
+              className={`px-3 py-1.5 border transition-all ${
+                isDemoActive
+                  ? 'opacity-40 cursor-not-allowed text-secondary border-transparent select-none'
+                  : activeInputTab === 'pdf'
                   ? 'bg-surface text-navy border-border-dark shadow-ink-press'
                   : 'text-secondary border-transparent hover:text-navy'
               }`}
@@ -214,7 +238,7 @@ export const LectureView: React.FC<LectureViewProps> = ({
             <button
               type="button"
               onClick={() => handleTabChange('preset')}
-              className={`px-3 py-1.5 rounded-lg border transition-all ${
+              className={`px-3 py-1.5 border transition-all ${
                 activeInputTab === 'preset'
                   ? 'bg-surface text-navy border-border-dark shadow-ink-press'
                   : 'text-secondary border-transparent hover:text-navy'
@@ -223,6 +247,12 @@ export const LectureView: React.FC<LectureViewProps> = ({
               Demo (Berkeley CS 152)
             </button>
           </div>
+          {isDemoActive && (
+            <div className="mt-2 text-[11px] font-mono text-secondary flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 bg-accent" />
+              <span>Demo access mode: Custom ingestion is restricted to the preloaded Berkeley CS 152 demo lecture.</span>
+            </div>
+          )}
 
           {/* Input field + Synthesize trigger */}
           <div className="mt-3 flex flex-col gap-2.5">

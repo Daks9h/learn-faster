@@ -6,29 +6,13 @@ import React from 'react';
  */
 
 export const ScoutMark: React.FC<{ className?: string; size?: number }> = ({ className = '', size = 36 }) => (
-  <svg
+  <img
+    src="/logo.png"
+    alt="Learn Faster"
     width={size}
     height={size}
-    viewBox="0 0 48 48"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className={className}
-    aria-hidden="true"
-  >
-    {/* Scout Explorer Cap & Visor */}
-    <rect x="10" y="10" width="28" height="28" rx="0" fill="rgba(201, 129, 60, 0.2)" stroke="rgba(215, 195, 255, 0.6)" strokeWidth="2" />
-    {/* Cap Bill */}
-    <path d="M12 20C12 16 16 14 24 14C32 14 36 16 36 20" stroke="#c9813c" strokeWidth="2" strokeLinecap="round" />
-    <path d="M22 10V14" stroke="#c9813c" strokeWidth="2.5" strokeLinecap="round" />
-    {/* Explorer Goggles / Eyes */}
-    <rect x="15" y="22" width="7" height="6" rx="0" fill="#18122c" stroke="#c9813c" strokeWidth="1.5" />
-    <rect x="26" y="22" width="7" height="6" rx="0" fill="#18122c" stroke="#c9813c" strokeWidth="1.5" />
-    <circle cx="18.5" cy="25" r="1.5" fill="#f3effa" />
-    <circle cx="29.5" cy="25" r="1.5" fill="#f3effa" />
-    <path d="M22 25H26" stroke="#c9813c" strokeWidth="2" />
-    {/* Determined smile */}
-    <path d="M21 32C22.5 33.5 25.5 33.5 27 32" stroke="#c9813c" strokeWidth="2" strokeLinecap="round" />
-  </svg>
+    className={`object-contain select-none pointer-events-none ${className}`}
+  />
 );
 
 export const RadarCompassGraphic: React.FC<{ className?: string }> = ({ className = '' }) => (

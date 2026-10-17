@@ -54,20 +54,13 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, onSelectTab, stats, c
             }`}
             title="Learn Faster — Home"
           >
-            <div className="w-9 h-9 rounded-lg border-2 border-border-dark bg-accent-tint flex items-center justify-center shadow-ink-sm group-hover:translate-x-0.5 group-hover:translate-y-0.5 transition-transform">
-              <ScoutMark size={28} />
+            <div className="w-9 h-9 border-2 border-border-dark bg-accent-tint/30 flex items-center justify-center shadow-ink-sm group-hover:translate-x-0.5 group-hover:translate-y-0.5 transition-transform overflow-hidden">
+              <img src="/logo.png" alt="Learn Faster" className="w-7 h-7 object-contain" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <span className="font-display font-black text-lg tracking-tight text-navy">
-                  Learn Faster
-                </span>
-                {courseBadge && (
-                  <span className="hidden sm:inline-block text-[11px] font-mono font-semibold text-secondary">
-                    {courseBadge}
-                  </span>
-                )}
-              </div>
+              <span className="font-display font-black text-lg tracking-tight text-navy">
+                Learn Faster
+              </span>
             </div>
           </button>
         </div>
