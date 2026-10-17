@@ -199,11 +199,8 @@ export default function App() {
       triggerToast(`Door unlocked! Welcome, ${user.name}!`);
     }
 
-    if (activeTab === 'auth') {
-      handleSelectTab('camp');
-    } else {
-      handleSelectTab(activeTab);
-    }
+    // The moment the user enters, the 3D Home page is the first page they encounter
+    handleSelectTab('home');
   };
 
   const handleLogout = () => {
@@ -215,7 +212,7 @@ export default function App() {
       localStorage.removeItem('learnfaster_is_demo_active');
     }
     triggerToast('Door locked. Signed out of session.');
-    handleSelectTab('camp');
+    handleSelectTab('home');
   };
 
   const isHome = activeTab === 'home' || activeTab === 'dashboard';
