@@ -20,6 +20,7 @@ import {
   GraduationCap
 } from 'lucide-react';
 import { ScoutMark } from './Illustrations';
+import { DashboardHero } from './DashboardHero/DashboardHero';
 
 interface ProfileViewProps {
   user: User;
@@ -71,8 +72,11 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
   return (
     <div className="max-w-4xl mx-auto py-2 space-y-6">
+      {/* NEW 3D/2D SPACE HERO SECTION */}
+      <DashboardHero />
+
       {/* 1. PERSONAL SCHOLAR BANNER */}
-      <section className="bg-surface border-2 border-border-dark rounded-2xl p-6 md:p-8 shadow-ink flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <section id="scholar-profile" className="bg-surface border-2 border-border-dark rounded-2xl p-6 md:p-8 shadow-ink flex flex-col md:flex-row md:items-center justify-between gap-6 scroll-mt-20">
         <div className="flex items-start sm:items-center gap-4 md:gap-5">
           <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-accent text-white border-2 border-border-dark flex items-center justify-center font-display font-black text-2xl sm:text-3xl shadow-ink-sm flex-shrink-0">
             {user.name.slice(0, 2).toUpperCase()}
