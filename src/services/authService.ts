@@ -3,6 +3,14 @@ import { User, AuthSession } from '../types';
 const TOKEN_KEY = 'lectureai_jwt_token';
 const USER_KEY = 'lectureai_jwt_user';
 
+function getApiBaseUrl(): string {
+  const envUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
+  if (envUrl) {
+    return envUrl.replace(/\/+$/, '');
+  }
+  return import.meta.env.DEV ? 'http://localhost:8787' : '';
+}
+
 /**
  * Base64URL decode helper for inspecting JWT payload on client.
  */
@@ -109,7 +117,7 @@ export const authService = {
 
   async login(email: string, password: string): Promise<AuthSession> {
     const trimmedEmail = email.trim().toLowerCase();
-    const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:8787').replace(/\/+$/, '');
+    const apiUrl = getApiBaseUrl();
 
     try {
       const response = await fetch(`${apiUrl}/api/auth/login`, {
@@ -165,7 +173,7 @@ export const authService = {
   async register(name: string, email: string, password: string, institution?: string): Promise<AuthSession> {
     const trimmedEmail = email.trim().toLowerCase();
     const trimmedName = name.trim();
-    const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:8787').replace(/\/+$/, '');
+    const apiUrl = getApiBaseUrl();
 
     try {
       const response = await fetch(`${apiUrl}/api/auth/register`, {

@@ -45,7 +45,8 @@ export async function analyzeLecture(
     throw new Error('Paste at least a few paragraphs of lecture text.');
   }
 
-  const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:8787').replace(/\/+$/, '');
+  const envUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
+  const apiUrl = (envUrl ? envUrl : (import.meta.env.DEV ? 'http://localhost:8787' : '')).replace(/\/+$/, '');
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => {

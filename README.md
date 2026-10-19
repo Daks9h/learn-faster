@@ -82,22 +82,24 @@ cd ..
 
 Create `.env` in the root folder:
 ```env
-VITE_API_BASE_URL=http://localhost:8787
+VITE_API_URL=http://localhost:8787
 ```
+*(Note: When deployed as a unified web service on Render, this variable can be omitted as the client automatically resolves API calls to the same origin.)*
 
 Create `server/.env` in the `server` folder:
 ```env
 PORT=8787
 AI_PROVIDER=gemini
 GEMINI_API_KEY=your_gemini_api_key_here
-GEMINI_MODEL=gemini-2.5-flash
+GEMINI_MODEL=gemini-3.8-flash
+JWT_SECRET=your_secure_jwt_secret_here
 ```
 
 *(Optional)* For offline local inference with Ollama:
 ```env
 AI_PROVIDER=ollama
-OLLAMA_BASE_URL=http://localhost:11434
-OLLAMA_MODEL=qwen2.5:7b
+LOCAL_AI_URL=http://localhost:11434
+LOCAL_MODEL=qwen2.5:7b-instruct
 ```
 
 ### 4. Run Locally
@@ -108,6 +110,33 @@ npm run dev:all
 
 - **Frontend:** [http://localhost:3000](http://localhost:3000)
 - **Backend API:** [http://localhost:8787](http://localhost:8787)
+
+---
+
+## 🚀 Deploying to Render (Web Service)
+
+You can deploy **Learn Faster** directly on [Render](https://render.com) as a single, unified Node.js Web Service:
+
+### Option 1: Automatic Blueprint (Recommended)
+1. Fork or push this repository to GitHub.
+2. In the Render Dashboard, click **New +** → **Blueprint**.
+3. Connect your repository. Render will automatically read [`render.yaml`](render.yaml).
+4. Enter your `GEMINI_API_KEY` when prompted. Render will automatically generate `JWT_SECRET` and deploy!
+
+### Option 2: Manual Web Service Setup
+1. In the Render Dashboard, click **New +** → **Web Service**.
+2. Connect your repository and select the **Node** runtime.
+3. Configure the service settings:
+   - **Build Command:** `npm run build`
+   - **Start Command:** `npm start`
+   - **Health Check Path:** `/api/health`
+4. In the **Environment Variables** tab, add:
+   - `NODE_ENV`: `production`
+   - `AI_PROVIDER`: `gemini`
+   - `GEMINI_MODEL`: `gemini-3.8-flash`
+   - `GEMINI_API_KEY`: *(your Google Gemini API key)*
+   - `JWT_SECRET`: *(a random 64-character secret)*
+5. Click **Deploy Web Service**. Render will build the Vite frontend and Express server together into a single lightning-fast production endpoint!
 
 ---
 

@@ -7,7 +7,7 @@ import { YoutubeTranscript } from 'youtube-transcript';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import crypto from 'crypto';
 import { z } from 'zod';
@@ -32,6 +32,33 @@ const allowedOrigins = Array.from(new Set([
   'http://127.0.0.1:5173'
 ]));
 
+// In-memory sliding-window rate limiter
+function createRateLimiter(windowMs: number, maxRequests: number, message: string) {
+  const ipRequests = new Map<string, { count: number; resetTime: number }>();
+  return (req: Request, res: Response, next: NextFunction): void => {
+    const forwarded = req.headers['x-forwarded-for'];
+    const ip = (typeof forwarded === 'string' ? forwarded.split(',')[0].trim() : req.ip) || req.socket.remoteAddress || 'unknown';
+    const now = Date.now();
+    const record = ipRequests.get(ip);
+
+    if (!record || now > record.resetTime) {
+      ipRequests.set(ip, { count: 1, resetTime: now + windowMs });
+      return next();
+    }
+
+    if (record.count >= maxRequests) {
+      res.status(429).json({ error: message });
+      return;
+    }
+
+    record.count++;
+    next();
+  };
+}
+
+const authLimiter = createRateLimiter(5 * 60 * 1000, 40, 'Too many authentication attempts. Please try again in 5 minutes.');
+const analyzeLimiter = createRateLimiter(15 * 60 * 1000, 30, 'Too many analysis requests. Please wait a few minutes before trying again.');
+
 // CORS configuration supporting SSE stream headers, custom progress header, and dev origins
 app.use(cors({
   origin: (origin, callback) => {
@@ -48,13 +75,19 @@ app.use(cors({
 
 app.use(express.json({ limit: '10mb' }));
 
-// Health Check
+// Health Check for Render & uptime monitors
 app.get('/api/health', (_req: Request, res: Response) => {
   res.json({ ok: true });
 });
 
+// Rate limit authentication routes
+app.use('/api/auth', authLimiter);
+
 // --- JWT & Auth ---
 const JWT_SECRET = process.env.JWT_SECRET || 'lectureai-super-secret-jwt-key-2026';
+if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
+  console.warn('[Server WARNING] Running in production without a custom JWT_SECRET! Set JWT_SECRET in your Render environment variables.');
+}
 
 interface ServerUser {
   id: string;
@@ -268,6 +301,19 @@ function validateAndNormalize(rawOutput: unknown): {
   if (rawOutput && typeof rawOutput === 'object') {
     const rawObj = rawOutput as any;
 
+    if (Array.isArray(rawObj.quickTake)) {
+      rawObj.quickTake = rawObj.quickTake
+        .filter((item: unknown) => typeof item === 'string' && item.trim().length > 0)
+        .map((item: string) => item.trim());
+      if (rawObj.quickTake.length === 0) {
+        rawObj.quickTake = ['High-yield lecture overview synthesized.'];
+      }
+    } else if (typeof rawObj.quickTake === 'string' && rawObj.quickTake.trim().length > 0) {
+      rawObj.quickTake = [rawObj.quickTake.trim()];
+    } else {
+      rawObj.quickTake = ['High-yield lecture overview synthesized.'];
+    }
+
     if (Array.isArray(rawObj.keyConcepts)) {
       for (const kc of rawObj.keyConcepts) {
         if (kc && typeof kc === 'object') {
@@ -344,7 +390,7 @@ function validateAndNormalize(rawOutput: unknown): {
 }
 
 // POST /api/analyze
-app.post('/api/analyze', async (req: Request, res: Response): Promise<void> => {
+app.post('/api/analyze', analyzeLimiter, async (req: Request, res: Response): Promise<void> => {
   let { text, youtubeUrl } = req.body || {};
   const streamRequested = req.headers['x-stream-progress'] === 'true' || req.query.stream === 'true';
 
@@ -560,6 +606,21 @@ app.post('/api/analyze', async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ error: 'An unexpected error occurred while analyzing the lecture.' });
   }
 });
+
+// --- Static Asset & SPA Serving for Web Service Deployment (Render / Single Server) ---
+const clientDist = path.resolve(__dirname, '../../dist');
+if (fs.existsSync(clientDist)) {
+  app.use(express.static(clientDist));
+
+  // Catch-all route to serve index.html for client-side SPA routing (e.g. /lecture, /radar, /quiz)
+  app.get('*', (req: Request, res: Response, next: NextFunction): void => {
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+    res.sendFile(path.join(clientDist, 'index.html'));
+  });
+  console.log(`[Server] Serving production static frontend from: ${clientDist}`);
+}
 
 app.listen(port, () => {
   const provider = (process.env.AI_PROVIDER || 'gemini').trim().toLowerCase();

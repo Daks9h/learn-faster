@@ -6,10 +6,16 @@
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
     "dev:all": "concurrently -n \"web,api\" -c \"cyan,magenta\" \"npm run dev\" \"npm --prefix server run dev\"",
-    "build": "vite build",
+    "build:client": "vite build",
+    "build:server": "npm --prefix server run build",
+    "build": "node scripts/build.js",
+    "start": "node server/dist/index.js",
     "preview": "vite preview",
-    "clean": "rm -rf dist server.js",
+    "clean": "node -e \"const fs = require('fs'); fs.rmSync('dist', { recursive: true, force: true }); fs.rmSync('server/dist', { recursive: true, force: true });\"",
     "lint": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.9",

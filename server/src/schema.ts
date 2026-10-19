@@ -70,7 +70,7 @@ export const CompressionSchema = z.object({
 
 export const StudyMaterialSchema = z.object({
   courseTitle: z.string(),
-  quickTake: z.array(z.string()).length(3),
+  quickTake: z.array(z.string()).min(1).max(6),
   keyConcepts: z.array(KeyConceptSchema),
   examRadar: z.array(ExamRadarItemSchema),
   flashcards: z.array(FlashcardItemSchema),
