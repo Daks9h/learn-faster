@@ -2,7 +2,7 @@ import React, { useRef, useMemo, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Stars } from '@react-three/drei';
 import * as THREE from 'three';
-import { ArrowRight, Compass, Radar } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { ScreenTab } from '../../types';
 
 interface HomePageCanvasProps {
@@ -323,10 +323,10 @@ export const HomePageCanvas: React.FC<HomePageCanvasProps> = ({
         </p>
 
         {/* Action CTA Buttons */}
-        <div className="mt-6 sm:mt-8 flex flex-wrap items-center justify-center sm:justify-start gap-3 pointer-events-auto">
+        <div className="mt-6 sm:mt-8 flex flex-wrap items-center justify-center sm:justify-start gap-3.5 pointer-events-auto">
           <button
             onClick={() => onNavigate('camp')}
-            className="px-6 py-3.5 rounded-xl bg-[#c9813c] hover:bg-[#b57130] text-white font-display font-black text-sm sm:text-base border-2 border-white/30 shadow-ink hover:translate-x-0.5 hover:translate-y-0.5 transition-all flex items-center gap-2.5 cursor-pointer pointer-events-auto"
+            className="h-[52px] px-6 rounded-xl bg-[#c9813c] hover:bg-[#b57130] text-white font-display font-black text-sm sm:text-base border-2 border-white/30 shadow-ink hover:translate-x-0.5 hover:translate-y-0.5 transition-all inline-flex items-center justify-center gap-2.5 cursor-pointer pointer-events-auto"
             title="Enter Course Basecamp"
           >
             <span>ENTER BASECAMP</span>
@@ -335,7 +335,7 @@ export const HomePageCanvas: React.FC<HomePageCanvasProps> = ({
 
           <button
             onClick={() => onNavigate('profile')}
-            className="px-5 py-3.5 rounded-xl bg-[#141024]/80 hover:bg-[#141024] text-white font-display font-bold text-xs sm:text-sm border-2 border-white/20 hover:border-white/40 shadow-ink transition-all flex items-center gap-2 cursor-pointer pointer-events-auto"
+            className="h-[52px] px-6 rounded-xl bg-[#141024]/80 hover:bg-[#141024] text-white font-display font-bold text-sm sm:text-base border-2 border-white/20 hover:border-white/40 shadow-ink hover:translate-x-0.5 hover:translate-y-0.5 transition-all inline-flex items-center justify-center gap-2 cursor-pointer pointer-events-auto"
             title="View Scholar Profile & Course Alignment"
           >
             <span>VIEW PROFILE</span>
@@ -343,29 +343,7 @@ export const HomePageCanvas: React.FC<HomePageCanvasProps> = ({
         </div>
       </div>
 
-      {/* 4. CORNER NAVIGATION LINKS (Point to existing routes like the reference) */}
-      <div className="relative z-20 w-full max-w-7xl mx-auto px-6 sm:px-12 pb-6 flex items-center justify-between text-xs font-mono font-bold text-[#a39cb8] pointer-events-auto">
-        <button
-          onClick={() => onNavigate('camp')}
-          className="hover:text-[#c9813c] transition-colors flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#141024]/80 border border-white/10 hover:border-[#c9813c]/40"
-          title="Open Camp"
-        >
-          <Compass className="w-3.5 h-3.5 text-[#c9813c]" />
-          <span>CAMP</span>
-          <span className="text-[#c9813c]">→</span>
-        </button>
-
-        <button
-          onClick={() => onNavigate('radar')}
-          className="hover:text-[#c9813c] transition-colors flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#141024]/80 border border-white/10 hover:border-[#c9813c]/40"
-          title="Open Exam Radar"
-        >
-          <Radar className="w-3.5 h-3.5 text-[#c9813c]" />
-          <span>EXAM RADAR</span>
-          <span className="text-[#c9813c]">→</span>
-        </button>
       </div>
-    </div>
   );
 };
 

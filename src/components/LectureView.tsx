@@ -30,6 +30,7 @@ const PROCESSING_STEPS = [
   'Identifying key concepts',
   'Building exam radar',
   'Preparing flashcards',
+  'Processing quiz questions',
 ];
 
 export const LectureView: React.FC<LectureViewProps> = ({ 
@@ -75,19 +76,34 @@ export const LectureView: React.FC<LectureViewProps> = ({
     };
   }, [isProcessing]);
 
-  // Smoothly increment percent between server updates to keep the meter dynamic and lively
+  // Smoothly increment percent between server updates to keep the meter dynamic, responsive and lively
   useEffect(() => {
     let ticker: NodeJS.Timeout | null = null;
     if (isProcessing) {
       ticker = setInterval(() => {
         setProgressPercent((current) => {
           if (current < 94) {
-            const step = current < 30 ? 1.2 : current < 60 ? 0.6 : current < 85 ? 0.3 : 0.1;
-            return Math.min(94, parseFloat((current + step).toFixed(1)));
+            const step = current < 30 ? 1.5 : current < 60 ? 0.8 : current < 80 ? 0.5 : 0.2;
+            const next = Math.min(94, parseFloat((current + step).toFixed(1)));
+
+            if (next >= 80 && next < 92) {
+              setProgressStage((prev) => 
+                prev.includes('Validating') ? prev : 'Processing adaptive combat quiz questions & options...'
+              );
+            } else if (next >= 60 && next < 80) {
+              setProgressStage((prev) => 
+                prev.includes('quiz') || prev.includes('Validating') ? prev : 'Synthesizing active recall flashcards...'
+              );
+            } else if (next >= 40 && next < 60) {
+              setProgressStage((prev) => 
+                prev.includes('flashcards') || prev.includes('quiz') || prev.includes('Validating') ? prev : 'Formulating predictive exam radar...'
+              );
+            }
+            return next;
           }
           return current;
         });
-      }, 500);
+      }, 400);
     }
     return () => {
       if (ticker) clearInterval(ticker);
@@ -116,7 +132,7 @@ export const LectureView: React.FC<LectureViewProps> = ({
 
     onStatusChange('processing');
     setProgressPercent(8);
-    setProgressStage('Connecting to local AI engine...');
+    setProgressStage('Connecting to AI synthesis engine...');
     setAllStepsCompleted(false);
 
     try {
@@ -374,10 +390,18 @@ export const LectureView: React.FC<LectureViewProps> = ({
                     Synthesizing Lecture & Structuring Exam Intelligence
                   </span>
                 </div>
-                <div className="flex flex-wrap items-center gap-2.5 text-xs font-mono text-secondary">
+                <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
                   <span className="flex items-center gap-1.5 text-navy font-bold">
                     <Clock className="w-3.5 h-3.5 text-accent" />
                     <span>Elapsed: {elapsedSeconds}s</span>
+                  </span>
+                  <span className="px-2 py-0.5 bg-accent-tint border border-border-dark text-accent font-bold text-[11px] flex items-center gap-1 shadow-ink-press">
+                    <span className="w-1.5 h-1.5 bg-accent animate-ping inline-block" />
+                    <span>AI SYNTHESIS ACTIVE</span>
+                  </span>
+                  <span className="px-2 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold text-[11px] flex items-center gap-1.5 shadow-ink-press animate-pulse">
+                    <Zap className="w-3 h-3 text-amber-400" />
+                    <span>PROCESSING QUESTIONS & QUIZ</span>
                   </span>
                 </div>
               </div>

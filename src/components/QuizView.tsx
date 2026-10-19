@@ -6,7 +6,6 @@ import {
   Zap, 
   ArrowRight, 
   RotateCcw, 
-  Clock, 
   Award,
   HelpCircle
 } from 'lucide-react';
@@ -22,7 +21,6 @@ interface QuizViewProps {
 
 export const QuizView: React.FC<QuizViewProps> = ({ 
   material, 
-  isDemoActive = false,
   onEarnXp, 
   onCompleteQuiz,
   onGoToLecture 
@@ -33,16 +31,16 @@ export const QuizView: React.FC<QuizViewProps> = ({
   const [correctCount, setCorrectCount] = useState(0);
   const [quizFinished, setQuizFinished] = useState(false);
 
-  if (!material) {
+  if (!material || !material.quiz || material.quiz.length === 0) {
     return (
       <div className="max-w-3xl mx-auto py-12">
         <div className="bg-surface border-2 border-border-dark p-8 shadow-ink text-center space-y-4">
           <div className="w-12 h-12 bg-accent-tint border-2 border-border-dark mx-auto flex items-center justify-center shadow-ink-sm">
             <HelpCircle className="w-6 h-6 text-accent" />
           </div>
-          <h2 className="font-display font-black text-xl text-navy">No Quiz Arena Available</h2>
+          <h2 className="font-display font-black text-xl text-navy">No Quiz Questions Available</h2>
           <p className="text-xs sm:text-sm text-secondary max-w-md mx-auto">
-            Synthesize or load a lecture to generate combat quiz questions and test your understanding.
+            Synthesize or load a lecture to automatically generate your adaptive combat quiz.
           </p>
           <button
             onClick={onGoToLecture}
@@ -51,39 +49,6 @@ export const QuizView: React.FC<QuizViewProps> = ({
             <span>Go to Lecture Tab</span>
             <ArrowRight className="w-4 h-4" />
           </button>
-        </div>
-      </div>
-    );
-  }
-
-  // For real user custom lectures & YouTube links, quiz generation is bypassed for faster speed:
-  if (!isDemoActive || !material.quiz || material.quiz.length === 0) {
-    return (
-      <div className="max-w-2xl mx-auto py-12">
-        <div className="bg-surface border-2 border-border-dark p-8 shadow-ink text-center space-y-4">
-          <div className="w-14 h-14 bg-accent-tint border-2 border-border-dark mx-auto flex items-center justify-center shadow-ink-sm">
-            <HelpCircle className="w-7 h-7 text-accent" />
-          </div>
-          <div className="space-y-1.5">
-            <span className="px-2.5 py-0.5 text-[10px] font-mono font-bold bg-accent-tint border border-border-dark text-accent uppercase tracking-wider">
-              Quiz Arena
-            </span>
-            <h2 className="font-display font-black text-2xl text-navy">
-              Work in progress, in the next update
-            </h2>
-          </div>
-          <p className="text-xs sm:text-sm text-secondary max-w-md mx-auto leading-relaxed">
-            Live combat quiz generation for custom lectures and YouTube links is currently being upgraded for ultra-fast performance. In the meantime, explore your synthesized Key Concepts, Exam Radar, and Active Recall Flashcards!
-          </p>
-          <div className="pt-2 flex justify-center">
-            <button
-              onClick={onGoToLecture}
-              className="px-5 py-2.5 bg-accent hover:bg-accent-hover text-white font-display font-black text-xs md:text-sm border-2 border-border-dark shadow-ink hover:translate-x-0.5 hover:translate-y-0.5 transition-all inline-flex items-center gap-2"
-            >
-              <span>Explore Synthesized Lecture</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
         </div>
       </div>
     );
@@ -126,8 +91,8 @@ export const QuizView: React.FC<QuizViewProps> = ({
 
     return (
       <div className="max-w-2xl mx-auto py-6 space-y-6">
-        <div className="bg-surface border-2 border-border-dark rounded-2xl p-6 sm:p-8 shadow-ink text-center space-y-4">
-          <div className="w-16 h-16 rounded-2xl bg-accent-tint border-2 border-border-dark mx-auto flex items-center justify-center shadow-ink-sm">
+        <div className="bg-surface border-2 border-border-dark p-6 sm:p-8 shadow-ink text-center space-y-4">
+          <div className="w-16 h-16 bg-accent-tint border-2 border-border-dark mx-auto flex items-center justify-center shadow-ink-sm">
             <Award className="w-8 h-8 text-accent" />
           </div>
 
@@ -143,7 +108,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
             </p>
           </div>
 
-          <div className="p-4 bg-page rounded-xl border-2 border-border-dark max-w-sm mx-auto text-xs font-mono space-y-2">
+          <div className="p-4 bg-page border-2 border-border-dark max-w-sm mx-auto text-xs font-mono space-y-2">
             <div className="flex justify-between">
               <span className="text-navy">Total XP Awarded:</span>
               <strong className="text-accent">+{correctCount * 20} XP</strong>
@@ -157,14 +122,14 @@ export const QuizView: React.FC<QuizViewProps> = ({
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
             <button
               onClick={handleRestart}
-              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-page hover:bg-surface border-2 border-border-dark font-display font-bold text-xs text-navy flex items-center justify-center gap-1.5 shadow-ink-press"
+              className="w-full sm:w-auto px-4 py-2.5 bg-page hover:bg-surface border-2 border-border-dark font-display font-bold text-xs text-navy flex items-center justify-center gap-1.5 shadow-ink-press"
             >
               <RotateCcw className="w-4 h-4" />
               <span>Retry Assessment</span>
             </button>
             <button
               onClick={onCompleteQuiz}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-accent hover:bg-accent-hover text-white font-display font-black text-xs md:text-sm border-2 border-border-dark shadow-ink hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-ink-press transition-all flex items-center justify-center gap-1.5"
+              className="w-full sm:w-auto px-5 py-2.5 bg-accent hover:bg-accent-hover text-white font-display font-black text-xs md:text-sm border-2 border-border-dark shadow-ink hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-ink-press transition-all flex items-center justify-center gap-1.5"
             >
               <span>View Knowledge Map</span>
               <ArrowRight className="w-4 h-4" />
@@ -180,9 +145,9 @@ export const QuizView: React.FC<QuizViewProps> = ({
   return (
     <div className="space-y-6 max-w-3xl mx-auto py-2">
       {/* 1. QUIZ HEADER */}
-      <div className="bg-surface border-2 border-border-dark rounded-2xl p-4 sm:p-5 shadow-ink-sm flex items-center justify-between">
+      <div className="bg-surface border-2 border-border-dark p-4 sm:p-5 shadow-ink-sm flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <span className="px-2.5 py-1 rounded-lg bg-accent text-white font-mono font-black text-xs border border-border-dark">
+          <span className="px-2.5 py-1 bg-accent text-white font-mono font-black text-xs border border-border-dark">
             QUESTION {currentIdx + 1} / {material.quiz.length}
           </span>
           <h1 className="font-display font-black text-base md:text-lg text-navy">
@@ -191,7 +156,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 text-xs font-mono font-bold text-accent bg-accent-tint px-2.5 py-1 rounded-lg border border-border-dark">
+          <div className="flex items-center gap-1 text-xs font-mono font-bold text-accent bg-accent-tint px-2.5 py-1 border border-border-dark">
             <Zap className="w-3.5 h-3.5" />
             <span>+20 XP</span>
           </div>
@@ -199,7 +164,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
       </div>
 
       {/* 2. QUESTION STATEMENT */}
-      <div className="bg-[#141026] border-2 border-border-dark rounded-2xl p-5 sm:p-6 shadow-ink space-y-3">
+      <div className="bg-[#141026] border-2 border-border-dark p-5 sm:p-6 shadow-ink space-y-3">
         <div className="flex items-center justify-between text-xs font-mono">
           <span className="text-accent font-bold uppercase">
             {question.concept}
@@ -233,10 +198,10 @@ export const QuizView: React.FC<QuizViewProps> = ({
                 key={idx}
                 onClick={() => handleSelectOption(idx)}
                 disabled={answered}
-                className={`w-full text-left p-3.5 rounded-xl border-2 transition-all flex items-start gap-3 shadow-ink-press ${btnStyle}`}
+                className={`w-full text-left p-3.5 border-2 transition-all flex items-start gap-3 shadow-ink-press ${btnStyle}`}
               >
                 <span
-                  className={`w-7 h-7 rounded-lg border border-border-dark flex items-center justify-center font-mono font-bold text-xs flex-shrink-0 mt-0.5 ${
+                  className={`w-7 h-7 border border-border-dark flex items-center justify-center font-mono font-bold text-xs flex-shrink-0 mt-0.5 ${
                     answered && isCorrectOption
                       ? 'bg-correct text-white'
                       : isSelected && answered && !isCorrectOption
@@ -266,12 +231,12 @@ export const QuizView: React.FC<QuizViewProps> = ({
       {/* 4. REAL-TIME FEEDBACK CALLOUT (REVEALED ON SELECTION) */}
       {answered && (
         <div
-          className={`p-4 rounded-xl border-2 border-border-dark shadow-ink-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+          className={`p-4 border-2 border-border-dark shadow-ink-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
             isSelectedCorrect ? 'bg-correct-tint' : 'bg-incorrect-tint'
           }`}
         >
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-xl bg-surface border-2 border-border-dark flex items-center justify-center flex-shrink-0 shadow-ink-press">
+            <div className="w-10 h-10 bg-surface border-2 border-border-dark flex items-center justify-center flex-shrink-0 shadow-ink-press">
               <ScoutMark size={28} />
             </div>
             <div className="space-y-0.5">
@@ -280,7 +245,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
                   {isSelectedCorrect ? 'Accurate Response' : 'Hardware Correction'}
                 </span>
                 {isSelectedCorrect && (
-                  <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-correct text-white">
+                  <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 bg-correct text-white">
                     +20 XP
                   </span>
                 )}
@@ -293,7 +258,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
 
           <button
             onClick={handleNext}
-            className="px-4 py-2 bg-accent hover:bg-accent-hover text-white font-display font-black text-xs md:text-sm rounded-xl border-2 border-border-dark shadow-ink hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-ink-press transition-all flex items-center justify-center gap-1.5 flex-shrink-0"
+            className="px-4 py-2 bg-accent hover:bg-accent-hover text-white font-display font-black text-xs md:text-sm border-2 border-border-dark shadow-ink hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-ink-press transition-all flex items-center justify-center gap-1.5 flex-shrink-0"
           >
             <span>{currentIdx + 1 < material.quiz.length ? 'Next Question' : 'Complete Quiz'}</span>
             <ArrowRight className="w-4 h-4" />

@@ -26,17 +26,18 @@ export const KnowledgeScoreView: React.FC<KnowledgeScoreViewProps> = ({
 }) => {
   const activeConcepts: ConceptItem[] = React.useMemo(() => {
     if (material?.keyConcepts && material.keyConcepts.length > 0) {
-      return material.keyConcepts.map((kc, idx) => ({
-        id: `kc-${idx}`,
-        name: kc.term,
+      return material.keyConcepts.map((kc: any, idx) => ({
+        id: kc.id || `kc-${idx}`,
+        name: kc.title || kc.term || `Concept ${idx + 1}`,
         category: kc.category || 'Core Syllabus',
+        slideRef: kc.slideRef || `Key Concept #${idx + 1}`,
         mastery: Math.min(100, Math.max(25, 45 + ((idx * 17) % 50))),
         status: (idx === 0 ? 'weak' : idx === 1 ? 'learning' : 'mastered') as 'weak' | 'learning' | 'mastered',
         examProbability: Math.min(95, 70 + ((idx * 7) % 28)),
-        priorityTier: (idx === 0 ? 'critical' : idx < 3 ? 'very-likely' : 'important') as 'critical' | 'very-likely' | 'important',
+        priorityTier: (idx === 0 ? 'very-likely' : idx < 3 ? 'important' : 'good-to-know') as 'very-likely' | 'important' | 'good-to-know',
         pointsImpact: 10 + (idx % 3) * 5,
-        description: kc.definition,
-        whyItMatters: kc.whyItMatters || 'High-frequency exam target and essential concept.',
+        description: kc.explanation || kc.definition || '',
+        whyItMatters: kc.whyItMatters || (kc.keyPoints && kc.keyPoints[0]) || 'High-frequency exam target and essential concept.',
         recommendedAction: 'Drill flashcards and combat quiz to achieve mastery.',
         trapAlert: kc.trapAlert,
         formula: kc.formula,

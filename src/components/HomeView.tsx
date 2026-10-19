@@ -111,9 +111,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
         {/* 6-Step Learning Path Stepper */}
         <div className="mt-6 pt-5 border-t-2 border-border">
           <div className="flex items-center justify-between mb-2.5">
-            <span className="text-xs font-mono font-extrabold text-navy uppercase tracking-wider flex items-center gap-1.5">
+            <span className="text-xs font-mono font-bold text-navy flex items-center gap-1.5">
               <Target className="w-3.5 h-3.5 text-accent" />
-              SYLLABUS PROGRESSION
+              <span>Syllabus Progression</span>
             </span>
           </div>
 
@@ -132,7 +132,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 <button
                   key={step.num}
                   onClick={() => onNavigate(step.tab)}
-                  className={`p-2.5 rounded-xl border-2 text-left transition-all ${
+                  className={`p-3 rounded-xl border-2 text-left transition-all min-h-[78px] flex flex-col justify-between ${
                     isActive
                       ? 'bg-accent-tint border-border-dark shadow-ink ring-2 ring-accent/40'
                       : isDone
@@ -153,7 +153,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   <div className="font-display font-bold text-xs text-navy mt-1">
                     {step.title}
                   </div>
-                  <div className="text-[10px] font-mono text-secondary mt-0.5">
+                  <div className="text-xs font-mono text-secondary mt-1">
                     {step.xp}
                   </div>
                 </button>
@@ -174,7 +174,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <span className="font-mono text-xs font-black uppercase text-accent">
                 High Danger Alert
               </span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-surface border border-border-dark font-bold text-navy">
+              <span className="text-xs font-mono px-2 py-0.5 rounded bg-surface border border-border-dark font-bold text-navy">
                 Midterm Impact: ~{weakConcept.pointsImpact} Pts
               </span>
             </div>
@@ -186,7 +186,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
         <button
           onClick={onTargetRevision}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-accent hover:bg-accent-hover text-white font-display font-black text-xs md:text-sm border-2 border-border-dark shadow-ink hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-ink-press transition-all flex-shrink-0"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-surface hover:bg-page text-navy hover:text-accent font-display font-bold text-xs md:text-sm border-2 border-border-dark shadow-ink hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-ink-press transition-all flex-shrink-0"
         >
           <span>FIX WEAK TOPIC (3 MIN)</span>
           <ArrowRight className="w-4 h-4" />
@@ -205,9 +205,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <BookOpen className="w-5 h-5 text-accent" />
             </div>
             <div className="text-[11px] font-mono text-secondary uppercase font-bold">Step 01</div>
-            <h3 className="font-display font-black text-sm text-navy mt-0.5">
+            <h2 className="font-display font-black text-sm text-navy mt-0.5">
               Lecture Intake
-            </h3>
+            </h2>
           </div>
           <div className="mt-3 pt-2 border-t border-border flex items-center justify-between text-xs font-mono font-bold text-accent">
             <span>Open Portal</span>
@@ -225,9 +225,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <Radar className="w-5 h-5 text-accent" />
             </div>
             <div className="text-[11px] font-mono text-secondary uppercase font-bold">Step 02 · Signature</div>
-            <h3 className="font-display font-black text-sm text-navy mt-0.5">
+            <h2 className="font-display font-black text-sm text-navy mt-0.5">
               Exam Radar
-            </h3>
+            </h2>
           </div>
           <div className="mt-3 pt-2 border-t border-border flex items-center justify-between text-xs font-mono font-bold text-accent">
             <span>View Radar</span>
@@ -245,9 +245,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <Layers className="w-5 h-5 text-accent" />
             </div>
             <div className="text-[11px] font-mono text-secondary uppercase font-bold">Step 03</div>
-            <h3 className="font-display font-black text-sm text-navy mt-0.5">
+            <h2 className="font-display font-black text-sm text-navy mt-0.5">
               Active Recall Deck
-            </h3>
+            </h2>
           </div>
           <div className="mt-3 pt-2 border-t border-border flex items-center justify-between text-xs font-mono font-bold text-accent">
             <span>Flip Cards</span>
@@ -265,9 +265,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <HelpCircle className="w-5 h-5 text-accent" />
             </div>
             <div className="text-[11px] font-mono text-secondary uppercase font-bold">Step 04</div>
-            <h3 className="font-display font-black text-sm text-navy mt-0.5">
+            <h2 className="font-display font-black text-sm text-navy mt-0.5">
               Adaptive Combat Quiz
-            </h3>
+            </h2>
           </div>
           <div className="mt-3 pt-2 border-t border-border flex items-center justify-between text-xs font-mono font-bold text-accent">
             <span>Start Test (+20 XP)</span>
@@ -290,16 +290,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 md:self-center">
           <div className="text-right">
             <div className="text-xs font-mono text-secondary">Overall Exam Readiness</div>
-            <div className="text-xl font-display font-black text-accent">
+            <div className="text-xl font-display font-black text-navy">
               {stats.masteryOverall}% Prepared
             </div>
           </div>
           <button
             onClick={() => onNavigate('score')}
-            className="px-3.5 py-2 rounded-lg bg-page hover:bg-surface border-2 border-border-dark text-xs font-display font-bold text-navy shadow-ink-press"
+            className="h-10 px-4 rounded-xl bg-page hover:bg-surface border-2 border-border-dark text-xs font-display font-bold text-navy shadow-ink-press transition-all inline-flex items-center justify-center"
           >
             Inspect Knowledge Map
           </button>

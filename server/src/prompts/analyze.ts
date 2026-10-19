@@ -53,16 +53,26 @@ JSON OUTPUT STRUCTURE:
       "concept": "Must EXACTLY match one of the keyConcepts titles above",
       "difficulty": "easy" | "medium" | "hard"
     }
+  ],
+  "quiz": [
+    {
+      "question": "Clear multiple-choice question testing conceptual understanding (1 sentence)",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "correctAnswer": 0,
+      "explanation": "Brief 1-sentence rationale explaining why the correct option is right",
+      "concept": "Must EXACTLY match one of the keyConcepts titles above"
+    }
   ]
 }
 
-SPECIFIC CONSTRAINTS:
+SPECIFIC CONSTRAINTS & SPEED DIRECTIVES:
+- Speed & Low-Latency: Be concise and direct. Keep options and explanations brief (under 12 words per option, 1 sentence per explanation) to ensure fast output.
 - "quickTake": Exactly 3 concise items.
 - "keyConcepts": 3 to 4 items (1-2 punchy sentences each, max 2 keyPoints each). Include a "table" ONLY when the lecture presents a clear tabular mapping, truth table, or state transition rule; otherwise omit "table".
-- "examRadar": 3 to 4 items. Rank priority ("very_likely", "important", "good_to_know"). The "reason" must be 1 concise sentence and never claim probabilities or percentages.
-- "flashcards": 4 to 5 cards. Keep questions and answers to 1 concise sentence each.
-- EVERY item in "examRadar" and "flashcards" MUST have a "concept" field that EXACTLY matches one of the "title" strings in "keyConcepts".
-- DO NOT generate a "quiz" field. Quiz generation is bypassed to deliver ultra-fast outputs.
+- "examRadar": 3 items. Rank priority ("very_likely", "important", "good_to_know"). The "reason" must be 1 concise sentence and never claim probabilities or percentages.
+- "flashcards": 3 to 4 cards. Keep questions and answers to 1 concise sentence each.
+- "quiz": Exactly 3 to 4 questions. Each must have exactly 4 plausible options, with "correctAnswer" being an integer 0, 1, 2, or 3 corresponding to the index in "options". Explanation must be 1 concise sentence.
+- EVERY item in "examRadar", "flashcards", and "quiz" MUST have a "concept" field that EXACTLY matches one of the "title" strings in "keyConcepts".
 `;
 }
 

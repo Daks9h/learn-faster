@@ -423,18 +423,39 @@ app.post('/api/analyze', async (req: Request, res: Response): Promise<void> => {
   try {
     const provider = getAIProvider();
 
-    // First attempt
+    // Synthesis with automatic retry on initial network drop or cold connection
     let rawOutput: unknown;
-    try {
-      rawOutput = await provider.generateStudyMaterial(text, undefined, sendProgress);
-    } catch (err) {
-      console.error('[Analyze] Provider invocation failed (Attempt 1):', err instanceof Error ? err.message : err);
+    let providerErr: Error | null = null;
+    const MAX_PROVIDER_ATTEMPTS = 2;
+
+    for (let attempt = 1; attempt <= MAX_PROVIDER_ATTEMPTS; attempt++) {
+      try {
+        if (attempt > 1) {
+          sendProgress?.(25, 'Re-establishing AI engine connection & retrying synthesis (Attempt 2)...');
+          await new Promise((resolve) => setTimeout(resolve, 800));
+        }
+        rawOutput = await provider.generateStudyMaterial(text, undefined, sendProgress);
+        providerErr = null;
+        break;
+      } catch (err) {
+        providerErr = err instanceof Error ? err : new Error(String(err));
+        console.error(`[Analyze] Provider invocation attempt ${attempt} failed:`, providerErr.message);
+      }
+    }
+
+    if (providerErr || !rawOutput) {
+      const displayMsg = providerErr?.message?.includes('API_KEY')
+        ? 'Invalid or missing GEMINI_API_KEY. Please verify server/.env configuration.'
+        : providerErr?.message?.includes('NOT_FOUND')
+        ? 'Configured AI model was not found. Please verify GEMINI_MODEL in server/.env.'
+        : "We couldn't analyze this lecture on this take. Please try again or check your lecture input.";
+
       if (streamRequested) {
-        res.write(`data: ${JSON.stringify({ type: 'error', error: "We couldn't analyze this lecture." })}\n\n`);
+        res.write(`data: ${JSON.stringify({ type: 'error', error: displayMsg })}\n\n`);
         res.end();
         return;
       }
-      res.status(502).json({ error: "We couldn't analyze this lecture." });
+      res.status(502).json({ error: displayMsg });
       return;
     }
 
@@ -547,3 +568,13 @@ app.listen(port, () => {
   console.log(`[Server] Active AI Provider: ${provider} (${modelName})`);
   console.log(`[Server] Client origin restricted to: ${configuredOrigin}`);
 });
+
+// Pre-warm AI provider connection so the first user take is instantaneous
+setTimeout(() => {
+  try {
+    getAIProvider();
+    console.log('[Server] AI Provider initialized and ready for requests.');
+  } catch (err) {
+    console.warn('[Server] AI Provider initialization note:', err instanceof Error ? err.message : err);
+  }
+}, 300);

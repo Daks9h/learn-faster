@@ -66,7 +66,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, onSelectTab, stats, c
         </div>
 
         {/* Zone 2: Navigation Links (Clean single line, icon + text, zero pills) */}
-        <nav className="hidden lg:flex items-center gap-1 font-display font-bold text-xs">
+        <nav className="hidden lg:flex items-center gap-2 font-display font-bold text-xs">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id || (item.id === 'home' && activeTab === 'dashboard');

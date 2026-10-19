@@ -3,26 +3,36 @@ import { AIProvider } from './AIProvider.js';
 import { buildAnalyzePrompt, buildChunkSummaryPrompt } from '../prompts/analyze.js';
 
 function extractJson(responseText: string): unknown {
+  const clean = responseText.trim();
+
   // 1. Direct parse attempt
   try {
-    return JSON.parse(responseText.trim());
+    return JSON.parse(clean);
   } catch {}
 
   // 2. Extract within markdown code fences ```json ... ```
-  const codeBlockMatch = responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+  const codeBlockMatch = clean.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
   if (codeBlockMatch) {
     try {
       return JSON.parse(codeBlockMatch[1].trim());
     } catch {}
+    try {
+      const sanitized = codeBlockMatch[1].replace(/,\s*([}\]])/g, '$1');
+      return JSON.parse(sanitized.trim());
+    } catch {}
   }
 
   // 3. Extract outermost JSON object { ... }
-  const firstBrace = responseText.indexOf('{');
-  const lastBrace = responseText.lastIndexOf('}');
+  const firstBrace = clean.indexOf('{');
+  const lastBrace = clean.lastIndexOf('}');
   if (firstBrace !== -1 && lastBrace > firstBrace) {
-    const jsonSubstring = responseText.slice(firstBrace, lastBrace + 1);
+    const jsonSubstring = clean.slice(firstBrace, lastBrace + 1);
     try {
       return JSON.parse(jsonSubstring.trim());
+    } catch {}
+    try {
+      const sanitized = jsonSubstring.replace(/,\s*([}\]])/g, '$1');
+      return JSON.parse(sanitized.trim());
     } catch {}
   }
 
@@ -86,7 +96,7 @@ export class GeminiProvider implements AIProvider {
       contentToAnalyze = await this.summarizeLargeText(text);
     }
 
-    onProgress?.(60, 'Generating structured study package...');
+    onProgress?.(55, 'Generating structured study package & questions...');
     const isGemma = this.model.toLowerCase().includes('gemma');
     let prompt = buildAnalyzePrompt(contentToAnalyze, retryErrors);
 
@@ -99,11 +109,31 @@ export class GeminiProvider implements AIProvider {
       config.responseMimeType = 'application/json';
     }
 
-    const response = await this.ai.models.generateContent({
-      model: this.model,
-      contents: prompt,
-      ...(Object.keys(config).length > 0 ? { config } : {}),
-    });
+    // Schedule progressive heartbeats while waiting for Gemini to generate output
+    const progressStages = [
+      { delay: 1000, percent: 65, message: 'Extracting key concepts & invariants...' },
+      { delay: 2500, percent: 75, message: 'Formulating exam radar & predictive targets...' },
+      { delay: 4500, percent: 82, message: 'Synthesizing active recall flashcards...' },
+      { delay: 6500, percent: 88, message: 'Processing adaptive combat quiz questions & options...' },
+      { delay: 8500, percent: 92, message: 'Processing question explanations & answer validation...' },
+    ];
+
+    const timers = progressStages.map((stage) =>
+      setTimeout(() => {
+        onProgress?.(stage.percent, stage.message);
+      }, stage.delay)
+    );
+
+    let response;
+    try {
+      response = await this.ai.models.generateContent({
+        model: this.model,
+        contents: prompt,
+        ...(Object.keys(config).length > 0 ? { config } : {}),
+      });
+    } finally {
+      timers.forEach(clearTimeout);
+    }
 
     const responseText = response.text;
     if (!responseText) {
