@@ -1,9 +1,9 @@
-services:
+﻿services:
   - type: web
     name: learn-faster
     env: node
     plan: free
-    buildCommand: npm run build
+    buildCommand: npm install --legacy-peer-deps && npm run build
     startCommand: npm start
     healthCheckPath: /api/health
     envVars:

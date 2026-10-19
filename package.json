@@ -1,47 +1,46 @@
-{
-  "name": "learn-faster",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite --port=3000 --host=0.0.0.0",
-    "dev:all": "concurrently -n \"web,api\" -c \"cyan,magenta\" \"npm run dev\" \"npm --prefix server run dev\"",
-    "build:client": "vite build",
-    "build:server": "npm --prefix server run build",
-    "build": "node scripts/build.js",
-    "start": "node server/dist/index.js",
-    "preview": "vite preview",
-    "clean": "node -e \"const fs = require('fs'); fs.rmSync('dist', { recursive: true, force: true }); fs.rmSync('server/dist', { recursive: true, force: true });\"",
-    "lint": "tsc --noEmit"
-  },
-  "engines": {
-    "node": ">=20.0.0"
-  },
-  "dependencies": {
-    "@react-three/drei": "^10.7.9",
-    "@react-three/fiber": "^9.8.2",
-    "@tailwindcss/vite": "^4.3.3",
-    "@types/three": "^0.186.0",
-    "@vitejs/plugin-react": "^6.1.1",
-    "dotenv": "^17.2.3",
-    "express": "^4.21.2",
-    "lucide-react": "^0.546.0",
-    "motion": "^12.23.24",
-    "react": "^19.0.1",
-    "react-dom": "^19.0.1",
-    "three": "^0.186.1",
-    "vite": "^8.3.0"
-  },
-  "devDependencies": {
-    "@types/express": "^4.17.21",
-    "@types/node": "^22.14.0",
-    "@types/react": "^19.3.0",
-    "@types/react-dom": "^19.3.0",
-    "autoprefixer": "^10.4.21",
-    "concurrently": "^10.0.5",
-    "esbuild": "^0.25.0",
-    "tailwindcss": "^4.3.3",
-    "tsx": "^4.21.0",
-    "typescript": "^7.0.2"
-  }
+﻿{
+    "name":  "learn-faster",
+    "private":  true,
+    "version":  "0.0.0",
+    "type":  "module",
+    "scripts":  {
+                    "dev":  "vite --port=3000 --host=0.0.0.0",
+                    "dev:all":  "concurrently -n \"web,api\" -c \"cyan,magenta\" \"npm run dev\" \"npm --prefix server run dev\"",
+                    "build:client":  "vite build",
+                    "build:server":  "npm --prefix server run build",
+                    "build":  "node scripts/build.js",
+                    "start":  "node server/dist/index.js",
+                    "preview":  "vite preview",
+                    "clean":  "node -e \"const fs = require(\u0027fs\u0027); fs.rmSync(\u0027dist\u0027, { recursive: true, force: true }); fs.rmSync(\u0027server/dist\u0027, { recursive: true, force: true });\"",
+                    "lint":  "tsc --noEmit"
+                },
+    "engines":  {
+                    "node":  "\u003e=20.0.0"
+                },
+    "dependencies":  {
+                         "@react-three/drei":  "^10.7.9",
+                         "@react-three/fiber":  "^9.8.2",
+                         "@tailwindcss/vite":  "^4.3.3",
+                         "@types/three":  "^0.186.0",
+                         "@vitejs/plugin-react":  "^6.1.1",
+                         "dotenv":  "^17.2.3",
+                         "express":  "^4.21.2",
+                         "lucide-react":  "^0.546.0",
+                         "motion":  "^12.23.24",
+                         "react":  "^19.0.1",
+                         "react-dom":  "^19.0.1",
+                         "three":  "^0.186.1",
+                         "vite":  "^8.3.0"
+                     },
+    "devDependencies":  {
+                            "@types/express":  "^4.17.21",
+                            "@types/node":  "^22.14.0",
+                            "@types/react":  "^19.3.0",
+                            "@types/react-dom":  "^19.3.0",
+                            "autoprefixer":  "^10.4.21",
+                            "concurrently":  "^10.0.5",
+                            "tailwindcss":  "^4.3.3",
+                            "tsx":  "^4.21.0",
+                            "typescript":  "^7.0.2"
+                        }
 }
