@@ -61,7 +61,7 @@ const analyzeLimiter = createRateLimiter(15 * 60 * 1000, 30, 'Too many analysis 
 
 // CORS configuration supporting SSE stream headers, custom progress header, and dev origins
 app.use(cors({
-  origin: (origin, callback) => {
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     if (!origin || allowedOrigins.includes(origin) || origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
       callback(null, true);
     } else {
